@@ -1,20 +1,15 @@
-<script>
-
-import { ref } from 'vue'
-
+<script setup lang="ts">
 import {
     Carousel,
     CarouselContent,
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
-} from '@/components/ui/carousel'
-
+} from "@/components/ui/carousel"
 </script>
 
 <template>
     <main class="grid grid-cols-1 relative">
-
         <!-- Row 1 -->
         <div class="w-full min-h-screen relative flex flex-col gap-8 items-center justify-center p-4">
             <div
@@ -40,23 +35,23 @@ import {
             <div class="flex bg-[#343532] text-white w-2xl justify-center items-center *:flex-1 *:text-center shadow">
                 <div>
                     <h2>Check-in</h2>
-                    <div><i class="fa fa-calendar" aria-hidden="true"></i></div>
+                    <div><i class="fa fa-calendar" aria-hidden="true" /></div>
                 </div>
                 <div>
                     <h2>Garagem</h2>
-                    <div><i class="fa fa-car" aria-hidden="true"></i></div>
+                    <div><i class="fa fa-car" aria-hidden="true" /></div>
                 </div>
                 <div>
                     <h2>Quarto</h2>
-                    <div><i class="fa fa-building" aria-hidden="true"></i></div>
+                    <div><i class="fa fa-building" aria-hidden="true" /></div>
                 </div>
                 <div>
                     <h2>Pessoas</h2>
-                    <div><i class="fa fa-user" aria-hidden="true"></i></div>
+                    <div><i class="fa fa-user" aria-hidden="true" /></div>
                 </div>
                 <div class="bg-[#f2d1c9] h-full w-full flex flex-col justify-center *:font-bold">
                     <h2>Cheque</h2>
-                    <h2 class="-mt-1">Disponibilidade</h2>
+                    <h2 class="-mt-1" />Disponibilidade
                 </div>
             </div>
         </div>
@@ -72,7 +67,7 @@ import {
         <div class="w-full flex justify-center items-center mt-12">
             <Carousel class="w-[80%]">
                 <CarouselContent>
-                    <CarouselItem class="w-full flex justify-center" v-for="i in 5" :key="i">
+                    <CarouselItem v-for="i in 5" :key="i" class="w-full flex justify-center">
                         <div class="w-[80%] h-80 md:h-137 overflow-hidden rounded-xl shadow-lg">
                             <img class="w-full h-full object-cover" :src="`/images/HomeView/HomeViewCarousel/${i}.jpg`">
                         </div>
@@ -81,7 +76,7 @@ import {
                 <ClientOnly>
                     <CarouselPrevious />
                     <CarouselNext />
-                </ClientOnly>   
+                </ClientOnly>
             </Carousel>
         </div>
     </main>

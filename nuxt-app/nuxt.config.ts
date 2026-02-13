@@ -9,12 +9,13 @@ export default defineNuxtConfig({
         "@nuxtjs/tailwindcss",
         "@vueuse/nuxt",
         "shadcn-nuxt",
+        "@nuxtjs/color-mode",
     ],
     shadcn: {
-    /**
-     * Prefix for all the imported component.
-     * @default "Ui"
-     */
+        /**
+         * Prefix for all the imported component.
+         * @default "Ui"
+         */
         prefix: "",
         /**
          * Directory that the component lives in.
@@ -28,5 +29,8 @@ export default defineNuxtConfig({
         config: {
             standalone: false,
         },
+    },
+    colorMode: {
+        classSuffix: "",
     },
 })
