@@ -1,9 +1,8 @@
 <script setup lang="ts">
-
 </script>
 
 <template>
-    <div>
-        vascp
-    </div>
+    <UApp>
+        <NuxtPage />
+    </UApp>
 </template>

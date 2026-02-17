@@ -10,6 +10,7 @@ export default defineNuxtConfig({
         "@vueuse/nuxt",
         "shadcn-nuxt",
         "@nuxtjs/color-mode",
+        "@nuxt/ui",
     ],
     shadcn: {
         /**

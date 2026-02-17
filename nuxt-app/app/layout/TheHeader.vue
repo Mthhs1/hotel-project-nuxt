@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import {
+import type { NavigationMenuItem } from "@nuxt/ui"
+/*import {
     NavigationMenu,
     NavigationMenuContent,
     NavigationMenuItem,
     NavigationMenuLink,
     NavigationMenuList,
     NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
+} from "@/components/ui/navigation-menu" */
 
 import Switch from "~/components/ui/switch/Switch.vue"
 
 // 1. Chamamos o módulo do Nuxt para descobrir qual é o tema atual
 const colorMode = useColorMode()
 
-const isDark = computed({
-
+/*const isDark = computed({
     // O GET: Lê o Nuxt e traduz para o Botão
     // Quando a página carregar, o botão pergunta: "Devo ficar ligado?"
     get() {
@@ -29,63 +29,59 @@ const isDark = computed({
         // Se ficou false, avisamos para ir para 'light'.
         colorMode.preference = newValue ? "dark" : "light"
     },
-})
+})*/
+const items = computed<NavigationMenuItem[]>(() => [
+    {
+        label: "Pagina Inicial",
+        to: "/",
+    },
+    {
+        label: "Quartos",
+        children: [
+            {
+                label: "Quarto 1",
+            },
+            {
+                label: "Quarto 2",
+            },
+            {
+                label: "Quarto 3",
+            },
+        ],
+    },
+    {
+        label: "Contate nos",
+    },
+    {
+        label: "Sobre nós",
+    },
+])
 </script>
 
 <template>
-    <div class="max-w-screen z-1000 top-0 left-0 w-full sticky">
-        <div class="flex flex-col h-full w-full top-0 left-0  shadow shadow-white">
-            <section class="flex px-20 py-1 gap-4 text-[10px] bg-[#343532] font-extralight">
-                <h3 class="">
-                    (XX)-9XXXX-XXXX
-                </h3>
-                <h3>test@email.com</h3>
-            </section>
-            <header class="h-full bg-[#e6e6e6] px-20 flex flex-1 justify-between items-center">
-                <div class="h-full flex items-center">
-                    <div class="flex flex-col justify-center items-center max-h-max max-w-min">
-                        <h2 class="font-[Roboto Mono] tracking-[10px] font-thin text-2xl text-black">
-                            Três
-                        </h2>
-                        <h2 class="font-[Roboto Mono] tracking-[10px] font-thin text-2xl text-[#8b56a5]">
-                            amigos
-                        </h2>
-                    </div>
-                </div>
-                <NavigationMenu>
-                    <NavigationMenuList class="flex justify-center items-center gap-12">
-                        <NavigationMenuItem class="flex justify-center items-center gap-4">
-                            <Switch v-model="isDark" />
-                            <Icon name="tabler:moon-filled" />
-                        </NavigationMenuItem>
+    <div class="border-white border-b h-full flex flex-col sticky top-0 left-0 z-1000">
+        <section
+            class="flex px-20 py-1 gap-4 text-[10px] bg-[#343532] font-extralight text-inverted dark:text-[#899AB2]">
+            <h3 class="">
+                (XX)-9XXXX-XXXX
+            </h3>
+            <h3>test@email.com</h3>
+        </section>
+        <UHeader class="flex-1" title="Tres Amigos">
+            <template #title>
+                <h1 class="font-[Montserrat] font-light tracking-widest">
+                    Três Amigos
+                </h1>
+            </template>
 
-                        <NavigationMenuItem>
-                            Pagina Inicial
-                        </NavigationMenuItem>
+            <UNavigationMenu :ui="{ link: 'text-md', list: 'gap-12' }" content-orientation="vertical" :items="items" />
 
-                        <NavigationMenuItem>
-                            <NavigationMenuTrigger>Quartos</NavigationMenuTrigger>
-                            <NavigationMenuContent class="w-48">
-                                <NavigationMenuLink>Quarto 1</NavigationMenuLink>
-                                <NavigationMenuLink>Quarto 2</NavigationMenuLink>
-                                <NavigationMenuLink>Quarto 3</NavigationMenuLink>
-                            </NavigationMenuContent>
-                        </NavigationMenuItem>
-
-                        <NavigationMenuItem>
-                            Contate-nos
-                        </NavigationMenuItem>
-
-                        <NavigationMenuItem>
-                            Sobre nós
-                        </NavigationMenuItem>
-
-                        <NavigationMenuItem>
-                            <NuxtLink to="/LoginView" />Login
-                        </NavigationMenuItem>
-                    </NavigationMenuList>
-                </NavigationMenu>
-            </header>
-        </div>
+            <template #right>
+                <UColorModeButton />
+                <UButton to="/login" size="xl" class="flex justify-center rounded-none h-full shadow-xs shadow-black/50">
+                    Login
+                </UButton>
+            </template>
+        </UHeader>
     </div>
 </template>

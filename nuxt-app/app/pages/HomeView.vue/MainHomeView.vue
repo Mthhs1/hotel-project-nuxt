@@ -1,22 +1,33 @@
 <script setup lang="ts">
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from "@/components/ui/carousel"
+const carouselItems = [
+    "/images/HomeView/HomeViewCarousel/1.jpg",
+    "/images/HomeView/HomeViewCarousel/2.jpg",
+    "/images/HomeView/HomeViewCarousel/3.jpg",
+    "/images/HomeView/HomeViewCarousel/4.jpg",
+    "/images/HomeView/HomeViewCarousel/5.jpg",
+]
+// import {
+//     Carousel,
+//     CarouselContent,
+//     CarouselItem,
+//     CarouselNext,
+//     CarouselPrevious,
+// } from "@/components/ui/carousel"
 </script>
 
 <template>
-    <main class="grid grid-cols-1 relative">
+    <!-- <main class="grid grid-cols-1 relative">
+    </main> -->
+    <UMain>
         <!-- Row 1 -->
         <div class="w-full min-h-screen relative flex flex-col gap-8 items-center justify-center p-4">
             <div
                 class="absolute top-0 left-0 -z-1 h-full w-full bg-cover blur-[1px] brightness-70 bg-center bg-no-repeat bg-[url('~/assets/images/HomeView/HomeViewBackGround.jpg')]">
             </div>
             <div class="relative z-1 text-5xl font-extralight">
-                <h2 class="uppercase text-white border-b">Bem vindo ao Hotel Três Amigos</h2>
+                <h2 class="uppercase text-white border-b">
+                    Bem vindo ao Hotel Três Amigos
+                </h2>
             </div>
             <div class="flex relative text-white gap-12 items-center justify-center text-l max-w-sceen">
                 <button
@@ -57,27 +68,17 @@ import {
         </div>
 
         <!-- Row 3  -->
-        <div class="mt-8 text-3xl font-light tracking-wide flex justify-center">
+        <div class="my-8 text-3xl font-light tracking-wide flex justify-center">
             <h1>
                 Nossas acomodações para voce!
             </h1>
         </div>
 
         <!-- Row 4 -->
-        <div class="w-full flex justify-center items-center mt-12">
-            <Carousel class="w-[80%]">
-                <CarouselContent>
-                    <CarouselItem v-for="i in 5" :key="i" class="w-full flex justify-center">
-                        <div class="w-[80%] h-80 md:h-137 overflow-hidden rounded-xl shadow-lg">
-                            <img class="w-full h-full object-cover" :src="`/images/HomeView/HomeViewCarousel/${i}.jpg`">
-                        </div>
-                    </CarouselItem>
-                </CarouselContent>
-                <ClientOnly>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                </ClientOnly>
-            </Carousel>
+        <div class="h-96">
+            <UCarousel v-slot="{ item }" arrows dots loop :items="carouselItems" class="h-full max-w-3xl mx-auto">
+                <img :src="item" class="w-full h-96 object-cover rounded-lg">
+            </UCarousel>
         </div>
-    </main>
+    </UMain>
 </template>
