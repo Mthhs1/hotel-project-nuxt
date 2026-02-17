@@ -5,9 +5,10 @@ import MainHomeView from "./HomeView.vue/MainHomeView.vue"
 </script>
 
 <template>
-    <div class="grid grid-cols-1 grid-rows-[6rem_minmax(0,1fr)_1550px]">
+    <div class="flex flex-col min-h-screen">
         <TheHeader />
-        <MainHomeView />
+        <MainHomeView class="flex-1" />
         <Footer />
+        <Placeholder class="h-1500" />
     </div>
 </template>

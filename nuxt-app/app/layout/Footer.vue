@@ -1,5 +1,5 @@
 <template>
-    <div>
-        footer
-    </div>
+    <UFooter>
+        <h6>A</h6>
+    </UFooter>
 </template>
