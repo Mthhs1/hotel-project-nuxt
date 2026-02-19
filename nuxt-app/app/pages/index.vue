@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Footer from "@/layout/Footer.vue"
 import TheHeader from "@/layout/TheHeader.vue"
-import MainHomeView from "./HomeView.vue/MainHomeView.vue"
+import MainHomeView from "./HomeView/MainHomeView.vue"
 </script>
 
 <template>
@@ -9,6 +9,6 @@ import MainHomeView from "./HomeView.vue/MainHomeView.vue"
         <TheHeader />
         <MainHomeView class="flex-1" />
         <Footer />
-        <Placeholder class="h-1500" />
+        <!-- <Placeholder class="h-1500" /> -->
     </div>
 </template>

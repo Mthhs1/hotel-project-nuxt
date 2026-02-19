@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import TheFooter from "~/layout/TheFooter.vue"
 import TheHeader from "~/layout/TheHeader.vue"
+import MainLoginView from "./MainLoginView.vue"
 </script>
 
 <template>
-    <div class="grid grid-cols-1 grid-rows-[6rem_minmax(0,1fr)_1550px]">
+    <div class="flex flex-col min-h-screen">
         <TheHeader />
-        <div />
-        <Footer />
+        <MainLoginView />
+        <TheFooter />
     </div>
 </template>

@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import type { button } from '#build/ui';
+
+
+const isMounted = ref(false)
+
+onMounted(() => {
+    isMounted.value = true
+})
+
 const carouselItems = [
     "/images/HomeView/HomeViewCarousel/1.jpg",
     "/images/HomeView/HomeViewCarousel/2.jpg",
@@ -13,15 +22,26 @@ const carouselItems = [
         <!-- Row 1 -->
         <div class="w-full min-h-screen relative flex flex-col gap-8 items-center justify-center p-4">
             <div
-                class="absolute top-0 left-0 -z-1 h-full w-full bg-cover blur-[1px] brightness-70 bg-center bg-no-repeat bg-[url('~/assets/images/HomeView/HomeViewBackGround.jpg')]"
-            />
+                class="absolute top-0 left-0 -z-1 h-full w-full bg-cover blur-[1px] brightness-70 bg-center bg-no-repeat bg-[url('~/assets/images/HomeView/HomeViewBackGround.jpg')]" />
             <div class="relative z-1 text-5xl font-extralight">
-                <h2 class="uppercase text-white border-b">
+                <h2 class="uppercase text-white">
                     Bem vindo ao Hotel Três Amigos
                 </h2>
             </div>
-            <div class="flex relative text-white gap-12 items-center justify-center text-l max-w-sceen">
-                <button
+            <USeparator class="w-[70%]" />
+
+            <div class="flex relative text-white gap-12 items-center justify-center text-l max-w-sceen *:flex-1 w-96">
+
+                <UButton trailing-icon="tabler:arrow-narrow-right" :ui="{ base: 'hover:bg-[#97753d]' }" size="xl"
+                    color="secondary" variant="soft" class="rounded-none flex justify-center shadow-black/10 shadow-sm">
+                    FAÇA UM TOUR
+                </UButton>
+                <UButton trailing-icon="tabler:arrow-narrow-right" :ui="{ base: 'hover:bg-[#97753d] dark:shadow-white/10' }" size="xl"
+                    color="secondary" variant="soft" class="rounded-none flex justify-center shadow-black/10 shadow-sm">
+                    ENTRAR
+                </UButton>
+
+                <!-- <button
                     class="border-white border hover:shadow-xs hover:shadow-white hover:bg-[#bad1cd] uppercase p-2 rounded w-46 transition-all delay-100"
                 >
                     Faça um tour →
@@ -30,7 +50,7 @@ const carouselItems = [
                     class="border-white border hover:shadow-xs hover:shadow-white hover:bg-[#bad1cd] uppercase p-2 rounded w-46 transition-all delay-100"
                 >
                     Entrar →
-                </button>
+                </button> -->
             </div>
         </div>
 
@@ -69,8 +89,9 @@ const carouselItems = [
 
         <!-- Row 4 -->
         <div class="h-96 my-8">
-            <UCarousel v-slot="{ item }" arrows dots loop :items="carouselItems" class="h-full max-w-3xl mx-auto">
-                <img :src="item" class="w-full h-96 object-cover rounded-lg">
+            <UCarousel v-slot="{ item }" :arrows="isMounted" dots loop :items="carouselItems"
+                class="h-full max-w-3xl mx-auto">
+                <img :src="item" class="w-full h-96 object-cover rounded-lg" draggable="false">
             </UCarousel>
         </div>
     </UMain>
