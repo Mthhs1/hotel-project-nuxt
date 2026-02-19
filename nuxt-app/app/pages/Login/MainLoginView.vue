@@ -6,10 +6,8 @@ import LoginForm from "./LoginForm.vue"
     <UMain>
         <div class="flex min-h-screen *:flex-1">
             <div class="bg-[url('~/assets/images/LoginView/LoginMain.jpg')] bg-cover bg-center bg-no-repeat relative">
-                <div class="absolute inset-0 backdrop-blur-[2px]">
-                </div>
-                <div class="relative z-10 flex flex-col items-center gap-8 text-white p-4">
-                </div>
+                <div class="absolute inset-0 backdrop-blur-[2px]" />
+                <div class="relative z-10 flex flex-col items-center gap-8 text-white p-4" />
             </div>
             <div class="flex flex-col items-center justify-center">
                 <UCard variant="subtle" class="w-80 h-120 p-4">

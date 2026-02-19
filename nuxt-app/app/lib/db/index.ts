@@ -10,6 +10,7 @@ const db = drizzle({
         authToken: env.NODE_ENV === "development" ? undefined : env.TURSO_AUTH_TOKEN,
     },
     schema: schemas,
+    casing: "camelCase",
 })
 
 export default db
