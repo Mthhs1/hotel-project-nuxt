@@ -52,7 +52,7 @@ const items = computed<NavigationMenuItem[]>(() => [
 
         <template #right>
             <UColorModeButton />
-            <UButton to="/login" size="xl" class="flex justify-center rounded-1 h-full shadow-xs shadow-black/50">
+            <UButton trailing-icon="tabler:login-2" to="/login" size="xl" class="w-28 flex justify-center rounded-none h-full shadow-xs shadow-black/50 mx-4">
                 LOGIN
             </UButton>
         </template>
