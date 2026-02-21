@@ -19,10 +19,19 @@ import LoginForm from "./LoginForm.vue"
                     <template #default>
                         <LoginForm />
                     </template>
+
+                    <template #footer>
+                        <div class="flex justify-center">
+                            <h5>
+                                Sem conta?
+                                <ULink to="/register">
+                                    Registre-se!
+                                </ULink>
+                            </h5>
+                        </div>
+                    </template>
                 </UCard>
             </div>
-            <!-- <UContainer class="flex-1 h-full">2</UContainer>
-            <UContainer class="flex-1">1</UContainer> -->
         </div>
     </UMain>
 </template>

@@ -30,14 +30,16 @@ const items = computed<NavigationMenuItem[]>(() => [
 </script>
 
 <template>
-    <UHeader title="Tres Amigos" class="border-white border-b h-20 flex flex-col sticky top-0 left-0 z-1000">
+    <UHeader
+        :ui="{ root: 'border-none' }"
+        title="Tres Amigos"
+        class="h-20 flex flex-col sticky top-0 left-0 z-1000"
+    >
         <template #top>
             <section
                 class="flex px-20 py-1 gap-4 text-[10px] bg-[#343532] font-extralight text-inverted dark:text-[#899AB2]"
             >
-                <h3>
-                    (XX)-9XXXX-XXXX
-                </h3>
+                <h3>(XX)-9XXXX-XXXX</h3>
                 <h3>test@email.com</h3>
             </section>
         </template>
@@ -48,11 +50,20 @@ const items = computed<NavigationMenuItem[]>(() => [
             </h1>
         </template>
 
-        <UNavigationMenu :ui="{ link: 'text-md', list: 'gap-12' }" content-orientation="vertical" :items="items" />
+        <UNavigationMenu
+            :ui="{ link: 'text-md', list: 'gap-12' }"
+            content-orientation="vertical"
+            :items="items"
+        />
 
         <template #right>
             <UColorModeButton />
-            <UButton trailing-icon="tabler:login-2" to="/login" size="xl" class="w-28 flex justify-center rounded-none h-full shadow-xs shadow-black/50 mx-4">
+            <UButton
+                trailing-icon="tabler:login-2"
+                to="/login"
+                size="xl"
+                class="bg-[#3d3c38] dark:bg-white w-28 flex justify-center rounded-sm h-full shadow-xs shadow-black/50 mx-4"
+            >
                 LOGIN
             </UButton>
         </template>
