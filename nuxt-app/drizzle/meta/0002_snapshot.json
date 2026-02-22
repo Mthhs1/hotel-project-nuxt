@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "36b71d10-84e4-4f81-92ec-2ddb99a9923e",
-  "prevId": "999130b2-f396-4ddb-b829-03c6123fb8d2",
+  "id": "0721838e-ab2c-4929-be8e-fbd12ed34b52",
+  "prevId": "36b71d10-84e4-4f81-92ec-2ddb99a9923e",
   "tables": {
     "acessorio": {
       "name": "acessorio",
@@ -103,7 +103,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
@@ -227,7 +227,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
@@ -323,7 +323,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
@@ -400,7 +400,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false

@@ -1,9 +1,19 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useAuthStore } from "~/stores/authStore"
+
+const authStore = useAuthStore()
+
+onMounted(async () => {
+    await authStore.checkAuth()
+})
+</script>
 
 <template>
-    <UApp>
-        <NuxtPage />
-    </UApp>
+    <div>
+        <UApp>
+            <NuxtPage />
+        </UApp>
+    </div>
 </template>
 
 <style>

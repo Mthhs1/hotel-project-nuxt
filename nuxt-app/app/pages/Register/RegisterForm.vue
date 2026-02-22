@@ -1,6 +1,10 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
+import { useAuthStore } from "~/stores/authStore"
+
+const authStore = useAuthStore()
 
 const schema = z.object({
     name: z
@@ -14,7 +18,7 @@ const schema = z.object({
         .string("Senha requerida.")
         .min(6, "Sua senha deve ter pelo menos 6 caracteres"),
 
-    birthday: z.coerce
+    birthDay: z.coerce
         .date("Data inválida")
         .min(new Date(1950, 1, 1), "Data muito antiga.")
         .max(Date.now(), "Data inserida no futuro."),
@@ -26,7 +30,7 @@ const state = reactive<Partial<Schema>>({
     email: undefined,
     password: undefined,
     name: undefined,
-    birthday: undefined,
+    birthDay: undefined,
 })
 
 const toast = useToast()
@@ -43,20 +47,38 @@ mostra as mensagens de erro em vermelho na tela automaticamente, e a sua funçã
 
 Se passar (Sucesso): O Zod confirma que está tudo perfeito. O <UForm> então chama a sua função onSubmit e entrega o event.
 */
+const dateStrToTimestamp = z.coerce.date().transform((date) => {
+    return date.getTime()
+})
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     toast.add({
         title: "Success",
         description: "The form has been submitted.",
         color: "success",
+        duration: 1000,
     })
-    // eslint-disable-next-line no-console
     console.log(event.data)
+
+    const credentials = {
+        email: state.email,
+        password: state.password,
+        name: state.name,
+        birthDay: dateStrToTimestamp.parse(state.birthDay),
+    }
+
+    console.log(credentials)
+
+    const data = await authStore.handleSignUp(credentials)
+
+    console.log(data)
 }
 </script>
 
 <template>
     <div>
         <UForm
+            :disabled="authStore.GETisLoading"
             class="flex flex-col gap-2 justify-center items-center transition-all duration-75 ease-in-out"
             :state="state"
             :schema="schema"
@@ -71,9 +93,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                 >
                     <UInput
                         v-model="state.name"
+                        type="text"
                         :ui="{ base: 'bg-white/50' }"
                         variant="soft"
-                        type="text"
                         class="w-full"
                     />
                 </UFormField>
@@ -121,7 +143,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     name="birthday"
                 >
                     <UInputDate
-                        v-model="state.birthday"
+                        v-model="state.birthDay"
                         class="w-full"
                         variant="soft"
                     />
@@ -131,6 +153,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <USeparator />
 
             <UButton
+                :loading="authStore.GETisLoading"
                 label="Entrar"
                 type="submit"
                 class="flex justify-center w-[40%]"
