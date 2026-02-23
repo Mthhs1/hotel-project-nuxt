@@ -12,7 +12,7 @@ export default withNuxt(antfu({
     // You can also pass a function to modify the default ignores
     ignores: [
         "**/fixtures",
-    // ...globs
+        // ...globs
     ],
 
     // Parse the `.gitignore` file to get the ignores, on by default
@@ -25,6 +25,12 @@ export default withNuxt(antfu({
     stylistic: {
         indent: 4, // 4, or 'tab'
         quotes: "double", // or 'double'
+    },
+
+    rules: {
+        "style/brace-style": "off", // Disables the rule globally
+        "no-console": "off",
+        "arrow-parens": "as-needed",
     },
 
     // TypeScript and Vue are autodetected, you can also explicitly enable them:

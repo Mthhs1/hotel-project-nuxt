@@ -58,7 +58,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         color: "success",
         duration: 1000,
     })
-    console.log(event.data)
 
     const credentials = {
         email: state.email,
@@ -67,11 +66,24 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         birthDay: dateStrToTimestamp.parse(state.birthDay),
     }
 
-    console.log(credentials)
+    console.log("Entrando try")
+    let response
+    try {
+        response = await authStore.handleSignUp(credentials)
+        console.log("Try Form")
+    } catch (err) {
+        console.log("Catch Form")
+    }
 
-    const data = await authStore.handleSignUp(credentials)
-
-    console.log(data)
+    if (response && response.status >= 400 && response.status <= 500) {
+        console.log("Aqui")
+        if (
+            response.data.message &&
+            response.data.message === "Invalid email or password"
+        ) {
+            toast.add({ description: "Email ou Senha inválida!", color: "error" })
+        }
+    }
 }
 </script>
 

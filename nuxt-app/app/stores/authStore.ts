@@ -34,15 +34,24 @@ export const useAuthStore = defineStore("authStore", () => {
     async function handleSignIn(credentials: User) {
         isLoading.value = true
 
-        const data = await $fetch("/api/signin", {
-            method: "POST",
-            body: credentials,
-        })
+        let response
+        try {
+            response = await $fetch("/api/signin", {
+                method: "POST",
+                body: credentials,
+            })
 
+            isLogged.value = true
+        } catch (error) {
+            console.log("Catch Store")
+            isLoading.value = false
+            return error
+        }
+
+        
         isLoading.value = false
-        isLogged.value = true
 
-        return data
+        return response
     }
 
     async function handleLogout(): Promise<void> {

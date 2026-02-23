@@ -30,7 +30,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         color: "success",
         duration: 1000,
     })
-    console.log(event.data)
 
     const credentials = {
         email: state.email,
@@ -39,11 +38,31 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         name: undefined,
     }
 
-    console.log(credentials)
+    console.log("Entrando try")
 
-    const data = await authStore.handleSignIn(credentials)
+    let response
 
-    console.log(data)
+    try {
+        response = await authStore.handleSignIn(credentials)
+        console.log("Try Form")
+    } catch (err) {
+        console.log(err)
+    }
+
+    if (response && response.status >= 400 && response.status <= 500) {
+        console.log("Aqui")
+        if (
+            response.data.message &&
+            response.data.message === "Invalid email or password"
+        ) {
+            toast.add({
+                title: "Erro no Login!",
+                description: "Email ou Senha inválida!",
+                color: "error",
+                duration: 3000,
+            })
+        }
+    }
 }
 </script>
 

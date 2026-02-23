@@ -1,20 +1,40 @@
-/* eslint-disable no-console */
-
 import { auth } from "~/lib/auth"
+import { sleep } from "~/utils/sleep"
 
 export default defineEventHandler(async (event) => {
-    const body = await readBody(event)
+    await sleep(2000)
 
-    console.log("Credentials server")
+    let body
+
+    try {
+        body = await readBody(event)
+    } catch (error) {
+        throw createError({
+            cause: error,
+            status: 400,
+            message: "Erro na requisiçao do body",
+        })
+    }
+
+    console.log("Credentials Server SignIn")
     console.log(body)
 
-    const response = await auth.api.signInEmail({
-        body: { ...body, rememberMe: false },
-        asResponse: true,
-    })
+    let response
 
-    console.log(body)
-    console.log(response)
-
+    try {
+        // Mesmo que as credenciais estejam incorretas, ainda sim terá uma resposta
+        // só terá entrará no catch se tiver um erro grave da API
+        response = await auth.api.signInEmail({
+            body: { ...body, rememberMe: false },
+            asResponse: true,
+        })
+    } catch (error) {
+        console.log("Entrei no catch signin")
+        throw createError({
+            cause: error,
+            status: 400,
+            message: "Erro na chamada da api de Login (better-auth)",
+        })
+    }
     return response
 })

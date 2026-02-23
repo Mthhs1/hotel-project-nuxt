@@ -1,19 +1,23 @@
+<!-- eslint-disable style/brace-style -->
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
 import { useAuthStore } from "~/stores/authStore"
 
 const authStore = useAuthStore()
 
 onMounted(async () => {
-    await authStore.checkAuth()
+    try {
+        await authStore.checkAuth()
+    } catch (error) {
+        console.log(error)
+    }
 })
 </script>
 
 <template>
-    <div>
-        <UApp>
-            <NuxtPage />
-        </UApp>
-    </div>
+    <UApp>
+        <NuxtPage />
+    </UApp>
 </template>
 
 <style>

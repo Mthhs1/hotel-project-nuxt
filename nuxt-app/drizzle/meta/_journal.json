@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1771699535662,
-      "tag": "0000_marvelous_wendell_rand",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1771699993922,
-      "tag": "0001_wealthy_wild_child",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1771707139732,
-      "tag": "0002_redundant_nightshade",
+      "when": 1771800917311,
+      "tag": "0000_omniscient_tarantula",
       "breakpoints": true
     }
   ]
