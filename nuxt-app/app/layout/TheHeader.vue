@@ -3,6 +3,7 @@ import type { DropdownMenuItem, NavigationMenuItem } from "@nuxt/ui"
 import { useAuthStore } from "~/stores/authStore"
 
 const authStore = useAuthStore()
+const toast = useToast()
 
 const items = computed<NavigationMenuItem[]>(() => [
     {
@@ -43,7 +44,31 @@ const itemsDropdown = ref<DropdownMenuItem[][]>([
             label: "Logout",
             icon: "tabler:logout",
             onSelect: async () => {
-                await authStore.handleLogout()
+                toast.add({
+                    title: "Logout",
+                    description: "Sua solicitação de logout foi enviada.",
+                    color: "success",
+                    duration: 2000,
+                })
+                const response = await authStore.handleLogout()
+
+                if (response && response.success === true) {
+                    toast.add({
+                        title: "Logout bem-sucedido!",
+                        description: "Você saiu com sucesso.",
+                        color: "success",
+                        duration: 3000,
+                    })
+
+                    await navigateTo("/")
+                } else {
+                    toast.add({
+                        title: "Erro no Logout!",
+                        description: "Ocorreu um erro ao tentar sair.",
+                        color: "error",
+                        duration: 3000,
+                    })
+                }
             },
         },
     ],
@@ -80,9 +105,13 @@ const itemsDropdown = ref<DropdownMenuItem[][]>([
 
             <template #right>
                 <UColorModeButton />
+
                 <UButton
                     v-if="!authStore.GETisLogged"
-                    :loading="authStore.GETisLoading"
+                    :loading="
+                        authStore.GETisLoadingSignIn ||
+                        authStore.GETisLoadingSignUp
+                    "
                     trailing-icon="tabler:login-2"
                     to="/login"
                     size="xl"
@@ -90,6 +119,7 @@ const itemsDropdown = ref<DropdownMenuItem[][]>([
                 >
                     LOGIN
                 </UButton>
+
                 <UDropdownMenu v-else :items="itemsDropdown">
                     <UButton icon="tabler:user" />
                 </UDropdownMenu>

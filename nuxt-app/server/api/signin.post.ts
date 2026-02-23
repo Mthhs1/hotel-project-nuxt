@@ -1,5 +1,6 @@
 import { auth } from "~/lib/auth"
 import { sleep } from "~/utils/sleep"
+import { APIError, statusCodes } from "better-auth"
 
 export default defineEventHandler(async (event) => {
     await sleep(2000)
@@ -27,14 +28,15 @@ export default defineEventHandler(async (event) => {
         response = await auth.api.signInEmail({
             body: { ...body, rememberMe: false },
             asResponse: true,
+            
         })
     } catch (error) {
-        console.log("Entrei no catch signin")
         throw createError({
             cause: error,
             status: 400,
             message: "Erro na chamada da api de Login (better-auth)",
         })
     }
+
     return response
 })

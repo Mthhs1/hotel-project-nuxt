@@ -25,8 +25,8 @@ const toast = useToast()
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     toast.add({
-        title: "Success",
-        description: "The form has been submitted.",
+        title: "Successo!",
+        description: "Sua tentativa de login foi enviada.",
         color: "success",
         duration: 1000,
     })
@@ -38,19 +38,15 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         name: undefined,
     }
 
-    console.log("Entrando try")
-
     let response
 
     try {
         response = await authStore.handleSignIn(credentials)
-        console.log("Try Form")
     } catch (err) {
         console.log(err)
     }
 
     if (response && response.status >= 400 && response.status <= 500) {
-        console.log("Aqui")
         if (
             response.data.message &&
             response.data.message === "Invalid email or password"
@@ -63,12 +59,23 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             })
         }
     }
+
+    if (response && response.user) {
+        toast.add({
+            title: "Login bem-sucedido!",
+            description: "Você entrou com sucesso.",
+            color: "success",
+            duration: 3000,
+        })
+        await navigateTo("/")
+    }
 }
 </script>
 
 <template>
     <div>
         <UForm
+            :disabled="authStore.GETisLoadingSignIn"
             :schema="schema"
             class="flex flex-col gap-4 justify-center items-center"
             :state="state"
@@ -109,6 +116,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             </UContainer>
             <USeparator />
             <UButton
+                :loading="authStore.GETisLoadingSignIn"
+                :disabled="authStore.GETisLoadingSignIn"
                 label="Entrar"
                 type="submit"
                 class="flex justify-center w-[40%]"

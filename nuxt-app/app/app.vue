@@ -2,6 +2,7 @@
 <!-- eslint-disable no-console -->
 <script setup lang="ts">
 import { useAuthStore } from "~/stores/authStore"
+import TheSpinner from "./utils/TheSpinner.vue"
 
 const authStore = useAuthStore()
 
@@ -16,7 +17,10 @@ onMounted(async () => {
 
 <template>
     <UApp>
-        <NuxtPage />
+        <NuxtPage v-if="authStore.GETisLoadingPage">
+            <TheSpinner />
+        </NuxtPage>
+        <NuxtPage v-else />
     </UApp>
 </template>
 

@@ -1,8 +1,8 @@
 <!-- eslint-disable no-console -->
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
 import { useAuthStore } from "~/stores/authStore"
+import * as z from "zod"
 
 const authStore = useAuthStore()
 
@@ -16,7 +16,7 @@ const schema = z.object({
 
     password: z
         .string("Senha requerida.")
-        .min(6, "Sua senha deve ter pelo menos 6 caracteres"),
+        .min(8, "Sua senha deve ter pelo menos 8 caracteres"),
 
     birthDay: z.coerce
         .date("Data inválida")
@@ -53,8 +53,8 @@ const dateStrToTimestamp = z.coerce.date().transform((date) => {
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     toast.add({
-        title: "Success",
-        description: "The form has been submitted.",
+        title: "Successo",
+        description: "Seu cadastro foi enviado.",
         color: "success",
         duration: 1000,
     })
@@ -67,22 +67,37 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     }
 
     console.log("Entrando try")
+    
     let response
+
     try {
         response = await authStore.handleSignUp(credentials)
-        console.log("Try Form")
     } catch (err) {
-        console.log("Catch Form")
+        console.log(err)
     }
 
     if (response && response.status >= 400 && response.status <= 500) {
-        console.log("Aqui")
         if (
             response.data.message &&
             response.data.message === "Invalid email or password"
         ) {
-            toast.add({ description: "Email ou Senha inválida!", color: "error" })
-        }
+            toast.add({
+                title: "Erro no Login!",
+                description: "Email ou Senha inválida!",
+                color: "error",
+                duration: 3000,
+            })
+        }    let response
+    }
+
+    if (response && response.user) {
+        toast.add({
+            title: "Cadastro bem-sucedido!",
+            description: "Você se cadastrou com sucesso.",
+            color: "success",
+            duration: 3000,
+        })
+        await navigateTo("/login")
     }
 }
 </script>
@@ -90,7 +105,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 <template>
     <div>
         <UForm
-            :disabled="authStore.GETisLoading"
+            :disabled="authStore.GETisLoadingSignUp"
             class="flex flex-col gap-2 justify-center items-center transition-all duration-75 ease-in-out"
             :state="state"
             :schema="schema"
@@ -165,7 +180,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <USeparator />
 
             <UButton
-                :loading="authStore.GETisLoading"
+                :loading="authStore.GETisLoadingSignIn"
                 label="Entrar"
                 type="submit"
                 class="flex justify-center w-[40%]"

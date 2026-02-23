@@ -10,29 +10,40 @@ interface User {
 }
 
 export const useAuthStore = defineStore("authStore", () => {
-    const isLoading = ref(false)
+    const isLoadingSignIn = ref(false)
+    const isLoadingSignUp = ref(false)
     const isLogged = ref(false)
+    const isLoadingPage = ref(true)
 
-    const GETisLoading = computed(() => isLoading.value)
+    const GETisLoadingSignIn = computed(() => isLoadingSignIn.value)
+    const GETisLoadingPage = computed(() => isLoadingPage.value)
+    const GETisLoadingSignUp = computed(() => isLoadingSignUp.value)
     const GETisLogged = computed(() => isLogged.value)
 
     async function handleSignUp(credentials: User) {
-        isLoading.value = true
+        isLoadingSignUp.value = true
 
-        console.log("credentials")
-        console.log(credentials)
+        let response
 
-        const data = await $fetch("/api/signup", {
-            method: "POST",
-            body: credentials,
-        })
+        try {
+            response = await $fetch("/api/signup", {
+                method: "POST",
+                body: credentials,
+            })
+        } catch (error) {
+            console.log(error)
+            isLoadingSignUp.value = false
+            return error
+        }
 
-        isLoading.value = false
-        return data
+        isLoadingSignUp.value = false
+
+        console.log(response)
+        return response
     }
 
     async function handleSignIn(credentials: User) {
-        isLoading.value = true
+        isLoadingSignIn.value = true
 
         let response
         try {
@@ -43,31 +54,31 @@ export const useAuthStore = defineStore("authStore", () => {
 
             isLogged.value = true
         } catch (error) {
-            console.log("Catch Store")
-            isLoading.value = false
+            console.log(error)
+            isLoadingSignIn.value = false
             return error
         }
 
-        
-        isLoading.value = false
+        isLoadingSignIn.value = false
 
         return response
     }
 
-    async function handleLogout(): Promise<void> {
+    async function handleLogout() {
+        let response
+        
         try {
-            console.log("Iniciado processo logout")
-
-            await $fetch("/api/logout", {
+            response = await $fetch("/api/logout", {
                 method: "POST",
                 body: {},
             })
-
-            console.log("Aqui!")
             isLogged.value = false
         } catch (error) {
             console.log(error)
         }
+        console.log(response)
+
+        return response
     }
 
     async function checkAuth() {
@@ -80,11 +91,13 @@ export const useAuthStore = defineStore("authStore", () => {
             console.log(err)
         }
 
-        return null
+        isLoadingPage.value = false
     }
 
     return {
-        GETisLoading,
+        GETisLoadingSignIn,
+        GETisLoadingSignUp,
+        GETisLoadingPage,
         GETisLogged,
         handleSignUp,
         handleSignIn,

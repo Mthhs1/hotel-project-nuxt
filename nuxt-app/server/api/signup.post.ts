@@ -17,8 +17,7 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    console.log("Credentials server SignUp")
-    console.log(body)
+    body.role = "user"
 
     let response
 
@@ -34,9 +33,6 @@ export default defineEventHandler(async (event) => {
             message: "Erro na chamada da api de Cadastro (better-auth)",
         })
     }
-
-    console.log(body)
-    console.log(response)
 
     return response
 })
