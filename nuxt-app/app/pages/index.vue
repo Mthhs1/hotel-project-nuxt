@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TheHeader from "@/layout/TheHeader.vue"
+import MainHomeView from "~/components/Home/MainHomeView.vue"
 import TheFooter from "~/layout/TheFooter.vue"
-import MainHomeView from "./HomeView/MainHomeView.vue"
 </script>
 
 <template>

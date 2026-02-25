@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f4b2bdd3-08a3-4c40-9928-ea7356e8ba6e",
+  "id": "e817b5be-96a9-4f4b-84c6-42c46e08ab42",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "acessorio": {
@@ -14,22 +14,22 @@
           "notNull": true,
           "autoincrement": true
         },
-        "garagem": {
-          "name": "garagem",
+        "garage": {
+          "name": "garage",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "numeroGaragem": {
-          "name": "numeroGaragem",
+        "nGarage": {
+          "name": "nGarage",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "frigobar": {
-          "name": "frigobar",
+        "miniFridge": {
+          "name": "miniFridge",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -49,29 +49,29 @@
           "notNull": true,
           "autoincrement": false
         },
-        "piscina": {
-          "name": "piscina",
+        "piscine": {
+          "name": "piscine",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "hidromassagem": {
-          "name": "hidromassagem",
+        "hydromassage": {
+          "name": "hydromassage",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "comida": {
-          "name": "comida",
+        "foods": {
+          "name": "foods",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "bebida": {
-          "name": "bebida",
+        "drinks": {
+          "name": "drinks",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -379,6 +379,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'user'"
         }
       },
       "indexes": {
@@ -467,22 +475,43 @@
           "notNull": true,
           "autoincrement": true
         },
-        "precoBase": {
-          "name": "precoBase",
+        "basePrice": {
+          "name": "basePrice",
           "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "desconto": {
-          "name": "desconto",
+        "discount": {
+          "name": "discount",
           "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "tipoQuarto": {
-          "name": "tipoQuarto",
+        "priceMultiplier": {
+          "name": "priceMultiplier",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "hasDiscount": {
+          "name": "hasDiscount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "roomType": {
+          "name": "roomType",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -573,7 +602,8 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'pending'"
         }
       },
       "indexes": {},

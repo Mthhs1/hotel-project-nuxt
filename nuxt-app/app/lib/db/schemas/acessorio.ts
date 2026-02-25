@@ -2,15 +2,20 @@ import { int, sqliteTable, text } from "drizzle-orm/sqlite-core"
 
 export const acessorio = sqliteTable("acessorio", {
     id: int().primaryKey({ autoIncrement: true }),
-    garagem: int({ mode: "boolean" }).notNull(),
-    numeroGaragem: int().notNull(),
-    frigobar: int({ mode: "boolean" }).notNull(),
+    garage: int({ mode: "boolean" }).notNull(),
+    nGarage: int().notNull(),
+    miniFridge: int({ mode: "boolean" }).notNull(),
     tv: int({ mode: "boolean" }).notNull(),
     wifi: int({ mode: "boolean" }).notNull(),
-    piscina: int({ mode: "boolean" }).notNull(),
-    hidromassagem: int({ mode: "boolean" }).notNull(),
-    comida: text(),
-    bebida: text(),
-    createdAt: int().notNull().$default(() => Date.now()),
-    updateAt: int().notNull().$onUpdate(() => Date.now()).$onUpdate(() => Date.now()),
+    piscine: int({ mode: "boolean" }).notNull(),
+    hydromassage: int({ mode: "boolean" }).notNull(),
+    foods: text(),
+    drinks: text(),
+    createdAt: int()
+        .notNull()
+        .$default(() => Date.now()),
+    updateAt: int()
+        .notNull()
+        .$onUpdate(() => Date.now())
+        .$onUpdate(() => Date.now()),
 })

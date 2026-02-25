@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import MainRegisterView from "~/components/Register/MainRegisterView.vue";
 import TheFooter from "~/layout/TheFooter.vue"
 import TheHeader from "~/layout/TheHeader.vue"
-import MainRegisterView from "~/pages/Register/MainRegisterView.vue"
 </script>
 
 <template>

@@ -6,22 +6,53 @@ import TheSpinner from "./utils/TheSpinner.vue"
 
 const authStore = useAuthStore()
 
+const nuxtApp = useNuxtApp()
+
+nuxtApp.hook("page:start", () => {
+    authStore.SETisLoadingPage(true)
+})
+
+nuxtApp.hook("page:finish", () => {
+    authStore.SETisLoadingPage(false)
+})
+    
+/*
 onMounted(async () => {
+    authStore.SETisLoadingPage(true)
     try {
         await authStore.checkAuth()
     } catch (error) {
         console.log(error)
     }
 })
+*/
 </script>
 
 <template>
-    <UApp>
-        <NuxtPage v-if="authStore.GETisLoadingPage">
+    <div>
+        <NuxtLoadingIndicator color="#d97706" :height="3" />
+
+        <div
+            v-if="authStore.GETisLoadingPage"
+            class="fixed inset-0 z-9999 bg-white flex items-center justify-center transition-opacity duration-300"
+        >
             <TheSpinner />
-        </NuxtPage>
-        <NuxtPage v-else />
-    </UApp>
+        </div>
+
+        <UApp>
+            <NuxtPage />
+        </UApp>
+    </div>
+
+    <!-- <div>
+        <NuxtLoadingIndicator color="#d97706" :height="3" />
+        <UApp>
+            <NuxtPage v-if="authStore.GETisLoadingPage">
+                <TheSpinner />
+            </NuxtPage>
+            <NuxtPage v-else />
+        </UApp>
+    </div> -->
 </template>
 
 <style>

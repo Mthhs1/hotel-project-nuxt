@@ -1,6 +1,6 @@
-/* eslint-disable style/brace-style */
-/* eslint-disable no-console */
+import type { RefSymbol } from "@vue/reactivity"
 import { defineStore } from "pinia"
+import { authClient } from "~/lib/auth-client"
 
 interface User {
     email: string | undefined
@@ -12,13 +12,24 @@ interface User {
 export const useAuthStore = defineStore("authStore", () => {
     const isLoadingSignIn = ref(false)
     const isLoadingSignUp = ref(false)
-    const isLogged = ref(false)
     const isLoadingPage = ref(true)
 
+    const session = authClient.useSession()
+
     const GETisLoadingSignIn = computed(() => isLoadingSignIn.value)
-    const GETisLoadingPage = computed(() => isLoadingPage.value)
+    const GETisLoadingPage = computed(
+        () =>
+            isLoadingPage.value ||
+            session.value.isPending ||
+            session.value.isRefetching,
+    )
     const GETisLoadingSignUp = computed(() => isLoadingSignUp.value)
-    const GETisLogged = computed(() => isLogged.value)
+    const GETisLogged = computed(() => session.value.data?.session)
+    const GETUser = computed(() => session.value.data?.user)
+
+    function SETisLoadingPage(value: boolean) {
+        isLoadingPage.value = value
+    }
 
     async function handleSignUp(credentials: User) {
         isLoadingSignUp.value = true
@@ -38,7 +49,6 @@ export const useAuthStore = defineStore("authStore", () => {
 
         isLoadingSignUp.value = false
 
-        console.log(response)
         return response
     }
 
@@ -51,37 +61,34 @@ export const useAuthStore = defineStore("authStore", () => {
                 method: "POST",
                 body: credentials,
             })
-
-            isLogged.value = true
         } catch (error) {
-            console.log(error)
             isLoadingSignIn.value = false
             return error
         }
 
+        await session.value.refetch()
         isLoadingSignIn.value = false
-
         return response
     }
 
     async function handleLogout() {
         let response
-        
+
         try {
             response = await $fetch("/api/logout", {
                 method: "POST",
                 body: {},
             })
-            isLogged.value = false
+            console.log(session.value.data?.session)
         } catch (error) {
             console.log(error)
         }
-        console.log(response)
 
+        await session.value.refetch()
         return response
     }
 
-    async function checkAuth() {
+    /*async function checkAuth() {
         try {
             const res = await $fetch("/api/checkauth")
             if (res) {
@@ -92,16 +99,18 @@ export const useAuthStore = defineStore("authStore", () => {
         }
 
         isLoadingPage.value = false
-    }
+    }*/
 
     return {
         GETisLoadingSignIn,
         GETisLoadingSignUp,
         GETisLoadingPage,
         GETisLogged,
+        GETUser,
+        SETisLoadingPage,
         handleSignUp,
         handleSignIn,
         handleLogout,
-        checkAuth,
+        // checkAuth,
     }
 })

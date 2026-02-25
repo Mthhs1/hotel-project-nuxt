@@ -14,13 +14,16 @@ const items = computed<NavigationMenuItem[]>(() => [
         label: "Quartos",
         children: [
             {
-                label: "Quarto 1",
+                label: "Quarto Luxuoso",
+                to: "/rooms/1",
             },
             {
-                label: "Quarto 2",
+                label: "Quarto Padrão",
+                to: "/rooms/2",
             },
             {
-                label: "Quarto 3",
+                label: "Quarto Classe Alta",
+                to: "/rooms/3",
             },
         ],
     },
@@ -76,54 +79,56 @@ const itemsDropdown = ref<DropdownMenuItem[][]>([
 </script>
 
 <template>
-    <div>
-        <UHeader
-            :ui="{ root: 'border-none' }"
-            title="Tres Amigos"
-            class="h-20 flex flex-col sticky top-0 left-0 z-1000"
-        >
-            <template #top>
-                <section
-                    class="flex px-20 py-1 gap-4 text-[10px] bg-[#343532] font-extralight text-inverted dark:text-[#899AB2]"
-                >
-                    <h3>(XX)-9XXXX-XXXX</h3>
-                    <h3>test@email.com</h3>
-                </section>
-            </template>
+    <UHeader
+        :ui="{ root: 'border-none' }"
+        title="Tres Amigos"
+        class="h-20 flex flex-col sticky top-0 left-0 z-1000"
+    >
+        <template #top>
+            <section
+                class="flex px-20 py-1 gap-4 text-[10px] bg-[#343532] font-extralight text-inverted dark:text-[#899AB2]"
+            >
+                <h3>(XX)-9XXXX-XXXX</h3>
+                <h3>test@email.com</h3>
+            </section>
+        </template>
 
-            <template #title>
-                <h1 class="font-[Montserrat] font-light tracking-widest">
-                    Três Amigos
-                </h1>
-            </template>
+        <template #title>
+            <h1 class="font-[Montserrat] font-light tracking-widest">
+                Três Amigos
+            </h1>
+        </template>
 
-            <UNavigationMenu
-                :ui="{ link: 'text-sm', list: 'gap-12' }"
-                content-orientation="vertical"
-                :items="items"
-            />
+        <UNavigationMenu
+            :ui="{
+                link: 'text-sm',
+                list: 'gap-12',
+                childLink: 'items-center justify-center',
+                content: 'w-auto',
+            }"
+            content-orientation="vertical"
+            :items="items"
+        />
 
-            <template #right>
-                <UColorModeButton />
+        <template #right>
+            <UColorModeButton />
 
-                <UButton
-                    v-if="!authStore.GETisLogged"
-                    :loading="
-                        authStore.GETisLoadingSignIn ||
-                        authStore.GETisLoadingSignUp
-                    "
-                    trailing-icon="tabler:login-2"
-                    to="/login"
-                    size="xl"
-                    class="bg-[#3d3c38] dark:bg-white w-28 flex justify-center rounded-sm h-full shadow-xs shadow-black/50 mx-4"
-                >
-                    LOGIN
-                </UButton>
+            <UButton
+                v-if="!authStore.GETisLogged"
+                :loading="
+                    authStore.GETisLoadingSignIn || authStore.GETisLoadingSignUp
+                "
+                trailing-icon="tabler:login-2"
+                to="/login"
+                size="xl"
+                class="bg-[#3d3c38] dark:bg-white w-28 flex justify-center rounded-sm h-full shadow-xs shadow-black/50 mx-4"
+            >
+                LOGIN
+            </UButton>
 
-                <UDropdownMenu v-else :items="itemsDropdown">
-                    <UButton icon="tabler:user" />
-                </UDropdownMenu>
-            </template>
-        </UHeader>
-    </div>
+            <UDropdownMenu v-else :items="itemsDropdown">
+                <UButton size="xl" icon="tabler:user" />
+            </UDropdownMenu>
+        </template>
+    </UHeader>
 </template>

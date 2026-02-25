@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import TheFooter from "~/layout/TheFooter.vue"
-import TheHeader from "~/layout/TheHeader.vue"
-import MainLoginView from "./MainLoginView.vue"
+import MainLoginView from '~/components/Login/MainLoginView.vue';
+import TheFooter from '~/layout/TheFooter.vue';
+import TheHeader from '~/layout/TheHeader.vue';
 </script>
 
 <template>
