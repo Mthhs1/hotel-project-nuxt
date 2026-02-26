@@ -1,11 +1,8 @@
-<!-- eslint-disable style/brace-style -->
-<!-- eslint-disable no-console -->
 <script setup lang="ts">
 import { useAuthStore } from "~/stores/authStore"
 import TheSpinner from "./utils/TheSpinner.vue"
 
 const authStore = useAuthStore()
-
 const nuxtApp = useNuxtApp()
 
 nuxtApp.hook("page:start", () => {
@@ -15,17 +12,10 @@ nuxtApp.hook("page:start", () => {
 nuxtApp.hook("page:finish", () => {
     authStore.SETisLoadingPage(false)
 })
-    
-/*
-onMounted(async () => {
-    authStore.SETisLoadingPage(true)
-    try {
-        await authStore.checkAuth()
-    } catch (error) {
-        console.log(error)
-    }
+
+await callOnce("init-auth", async () => {
+    await authStore.init()
 })
-*/
 </script>
 
 <template>
@@ -40,19 +30,11 @@ onMounted(async () => {
         </div>
 
         <UApp>
-            <NuxtPage />
+            <NuxtLayout>
+                <NuxtPage />
+            </NuxtLayout>
         </UApp>
     </div>
-
-    <!-- <div>
-        <NuxtLoadingIndicator color="#d97706" :height="3" />
-        <UApp>
-            <NuxtPage v-if="authStore.GETisLoadingPage">
-                <TheSpinner />
-            </NuxtPage>
-            <NuxtPage v-else />
-        </UApp>
-    </div> -->
 </template>
 
 <style>

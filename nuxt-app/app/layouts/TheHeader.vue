@@ -114,7 +114,7 @@ const itemsDropdown = ref<DropdownMenuItem[][]>([
             <UColorModeButton />
 
             <UButton
-                v-if="!authStore.GETisLogged"
+                v-if="!authStore.isLogged"
                 :loading="
                     authStore.GETisLoadingSignIn || authStore.GETisLoadingSignUp
                 "
@@ -123,9 +123,8 @@ const itemsDropdown = ref<DropdownMenuItem[][]>([
                 size="xl"
                 class="bg-[#3d3c38] dark:bg-white w-28 flex justify-center rounded-sm h-full shadow-xs shadow-black/50 mx-4"
             >
-                LOGIN
+                Login
             </UButton>
-
             <UDropdownMenu v-else :items="itemsDropdown">
                 <UButton size="xl" icon="tabler:user" />
             </UDropdownMenu>

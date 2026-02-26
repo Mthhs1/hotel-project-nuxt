@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import TheFooter from "~/layout/TheFooter.vue"
-import TheHeader from "~/layout/TheHeader.vue"
-
 const route = useRoute()
 const router = useRouter()
 
 const carouselItems: string[] = reactive([])
 
 const numberOfImages = 5
-const mapIdToRooms = ["Quarto Luxuoso", "Quarto Padrão","Quarto Classe Alta"]
+const mapIdToRooms = ["Quarto Luxuoso", "Quarto Padrão", "Quarto Classe Alta"]
 
 const idPageStr = route.params.id
 const idPageIndex = Number(idPageStr)
@@ -29,8 +26,6 @@ try {
     for (let i = 2; i < numberOfImages + 1; i++) {
         carouselItems.push(response.data.value?.url + `${i}.jpg`)
     }
-
-    console.log(carouselItems)
 } catch (error) {
     console.log(error)
 }
@@ -40,7 +35,6 @@ const data = response?.data
 
 <template>
     <div>
-        <TheHeader />
         <UMain class="flex flex-col gap-4">
             <!-- Row 1 -->
             <div class="relative flex flex-col h-128">
@@ -88,11 +82,8 @@ const data = response?.data
 
             <!-- Row 3 -->
             <div class="h-128 relative p-12">
-                <UCard class="h-full">
-                    a
-                </UCard>
+                <UCard class="h-full"> a </UCard>
             </div>
         </UMain>
-        <TheFooter />
     </div>
 </template>

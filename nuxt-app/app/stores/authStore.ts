@@ -1,4 +1,3 @@
-import type { RefSymbol } from "@vue/reactivity"
 import { defineStore } from "pinia"
 import { authClient } from "~/lib/auth-client"
 
@@ -10,22 +9,26 @@ interface User {
 }
 
 export const useAuthStore = defineStore("authStore", () => {
+    const session = ref<Awaited<
+        ReturnType<typeof authClient.useSession>
+    > | null>(null)
+
+    async function init() {
+        const data = await authClient.useSession(useFetch)
+        session.value = data
+    }
+
     const isLoadingSignIn = ref(false)
     const isLoadingSignUp = ref(false)
     const isLoadingPage = ref(true)
 
-    const session = authClient.useSession()
-
     const GETisLoadingSignIn = computed(() => isLoadingSignIn.value)
     const GETisLoadingPage = computed(
-        () =>
-            isLoadingPage.value ||
-            session.value.isPending ||
-            session.value.isRefetching,
+        () => isLoadingPage.value || session.value?.isPending,
     )
     const GETisLoadingSignUp = computed(() => isLoadingSignUp.value)
-    const GETisLogged = computed(() => session.value.data?.session)
-    const GETUser = computed(() => session.value.data?.user)
+    const isLogged = computed(() => !!session.value?.data?.session)
+    const GETUser = computed(() => session.value?.data?.user)
 
     function SETisLoadingPage(value: boolean) {
         isLoadingPage.value = value
@@ -66,7 +69,6 @@ export const useAuthStore = defineStore("authStore", () => {
             return error
         }
 
-        await session.value.refetch()
         isLoadingSignIn.value = false
         return response
     }
@@ -79,38 +81,24 @@ export const useAuthStore = defineStore("authStore", () => {
                 method: "POST",
                 body: {},
             })
-            console.log(session.value.data?.session)
         } catch (error) {
             console.log(error)
         }
 
-        await session.value.refetch()
         return response
     }
-
-    /*async function checkAuth() {
-        try {
-            const res = await $fetch("/api/checkauth")
-            if (res) {
-                isLogged.value = true
-            }
-        } catch (err) {
-            console.log(err)
-        }
-
-        isLoadingPage.value = false
-    }*/
 
     return {
         GETisLoadingSignIn,
         GETisLoadingSignUp,
         GETisLoadingPage,
-        GETisLogged,
         GETUser,
+        isLogged,
+        session,
+        init,
         SETisLoadingPage,
         handleSignUp,
         handleSignIn,
         handleLogout,
-        // checkAuth,
     }
 })
