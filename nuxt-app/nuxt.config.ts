@@ -37,5 +37,7 @@ export default defineNuxtConfig({
             mode: "out-in",
         },
     },
-    devtools: { enabled: false },
+    devtools: {
+        enabled: false, // or false to disable
+    },
 })

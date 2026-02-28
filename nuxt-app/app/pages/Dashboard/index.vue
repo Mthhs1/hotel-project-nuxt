@@ -1,5 +1,13 @@
 <script setup lang="ts"></script>
 
 <template>
-    <div>Dashboard</div>
+    <div>
+        <template>
+            <UDashboardGroup>
+                <UDashboardSidebar />
+
+                <slot />
+            </UDashboardGroup>
+        </template>
+    </div>
 </template>

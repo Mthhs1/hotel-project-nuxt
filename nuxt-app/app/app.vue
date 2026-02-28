@@ -1,20 +1,25 @@
 <script setup lang="ts">
 import { useAuthStore } from "~/stores/authStore"
+import { authClient } from "./lib/auth-client"
+
 import TheSpinner from "./utils/TheSpinner.vue"
 
 const authStore = useAuthStore()
-const nuxtApp = useNuxtApp()
 
-nuxtApp.hook("page:start", () => {
-    authStore.SETisLoadingPage(true)
-})
-
-nuxtApp.hook("page:finish", () => {
+onMounted(async () => {
+    try {
+        // Faz a requisição no navegador (sem se preocupar com cookies de SSR)
+        authStore.SETisLoadingPage(true)
+        const { data, error } = await authClient.getSession()
+        console.log("Mounted")
+        console.log(data)
+        if (data) {
+            authStore.SET_Session(data)
+        }
+    } catch (error) {
+        console.error("Erro ao checar sessão:", error)
+    }
     authStore.SETisLoadingPage(false)
-})
-
-await callOnce("init-auth", async () => {
-    await authStore.init()
 })
 </script>
 
@@ -23,7 +28,7 @@ await callOnce("init-auth", async () => {
         <NuxtLoadingIndicator color="#d97706" :height="3" />
 
         <div
-            v-if="authStore.GETisLoadingPage"
+            v-if="authStore.GET_isLoadingPage"
             class="fixed inset-0 z-9999 bg-white flex items-center justify-center transition-opacity duration-300"
         >
             <TheSpinner />

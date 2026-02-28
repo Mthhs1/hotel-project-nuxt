@@ -33,10 +33,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     })
 
     const credentials = {
-        email: state.email,
-        password: state.password,
-        birthDay: undefined,
-        name: undefined,
+        email: event.data.email,
+        password: event.data.password,
     }
 
     let response

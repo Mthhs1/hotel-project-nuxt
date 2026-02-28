@@ -60,13 +60,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     })
 
     const credentials = {
-        email: state.email,
-        password: state.password,
-        name: state.name,
-        birthDay: dateStrToTimestamp.parse(state.birthDay),
+        email: event.data.email,
+        password: event.data.password,
+        name: event.data.name,
+        birthDay: dateStrToTimestamp.parse(event.data.birthDay),
     }
 
-    console.log("Entrando try")
     
     let response
 
