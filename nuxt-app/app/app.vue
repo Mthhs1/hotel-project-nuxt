@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { useAuthStore } from "~/stores/authStore"
-import { authClient } from "./lib/auth-client"
 
 import TheSpinner from "./utils/TheSpinner.vue"
 
 const authStore = useAuthStore()
 
+const data = useAsyncData("auth-init", async () => {
+    await authStore.GETSession()
+    return true
+})
+
+/*
 onMounted(async () => {
     try {
         // Faz a requisição no navegador (sem se preocupar com cookies de SSR)
@@ -21,6 +26,7 @@ onMounted(async () => {
     }
     authStore.SETisLoadingPage(false)
 })
+*/
 </script>
 
 <template>

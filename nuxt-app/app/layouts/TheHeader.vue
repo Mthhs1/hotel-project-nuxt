@@ -111,23 +111,29 @@ const itemsDropdown = ref<DropdownMenuItem[][]>([
         />
 
         <template #right>
-            <UColorModeButton />
+                <UColorModeButton />
 
-            <UButton
-                v-if="!authStore.isLogged"
-                :loading="
-                    authStore.GETisLoadingSignIn || authStore.GETisLoadingSignUp
-                "
-                trailing-icon="tabler:login-2"
-                to="/login"
-                size="xl"
-                class="bg-[#3d3c38] dark:bg-white w-28 flex justify-center rounded-sm h-full shadow-xs shadow-black/50 mx-4"
-            >
-                Login
-            </UButton>
-            <UDropdownMenu v-else :items="itemsDropdown">
-                <UButton size="xl" icon="tabler:user" />
-            </UDropdownMenu>
+                <div v-if="authStore.isLoadingHeaderIcons">
+                    <button :loading="true" />
+                </div>
+                <div v-else>
+                    <UButton
+                        v-if="!authStore.isLogged"
+                        :loading="
+                            authStore.GETisLoadingSignIn ||
+                            authStore.GETisLoadingSignUp
+                        "
+                        trailing-icon="tabler:login-2"
+                        to="/login"
+                        size="xl"
+                        class="bg-[#3d3c38] dark:bg-white w-28 flex justify-center rounded-sm h-full shadow-xs shadow-black/50 mx-4"
+                    >
+                        Login
+                    </UButton>
+                    <UDropdownMenu v-else :items="itemsDropdown">
+                        <UButton size="xl" icon="tabler:user" />
+                    </UDropdownMenu>
+                </div>
         </template>
     </UHeader>
 </template>

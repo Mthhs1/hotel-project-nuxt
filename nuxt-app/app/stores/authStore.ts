@@ -1,5 +1,7 @@
+import { error } from "#build/ui"
 import { defineStore } from "pinia"
 import { authClient } from "~/lib/auth-client"
+import { sleep } from "~/utils/sleep"
 
 interface User {
     email: string
@@ -16,9 +18,31 @@ type SessionType = typeof authClient.$Infer.Session
 export const useAuthStore = defineStore("authStore", () => {
     let session = ref<SessionType | null>(null)
 
+    async function GETSession() {
+        isLoadingHeaderIcons.value = true
+
+        const headers = import.meta.server
+            ? useRequestHeaders(["cookie"])
+            : undefined
+
+        const response = await authClient.getSession({
+            fetchOptions: { headers: headers },
+        })
+
+        if (!response.error) {
+            console.log("SUCESSO!")
+            SET_Session(response.data)
+        } else {
+            console.log("ERRO!")
+            console.log(response.error)
+        }
+        isLoadingHeaderIcons.value = false
+    }
+
     const isLoadingSignIn = ref(false)
     const isLoadingSignUp = ref(false)
-    const isLoadingPage = ref(true)
+    const isLoadingHeaderIcons = ref(false)
+    const isLoadingPage = ref(false)
 
     const GETisLoadingSignIn = computed(() => isLoadingSignIn.value)
     const GET_isLoadingPage = computed(() => isLoadingPage.value)
@@ -32,34 +56,68 @@ export const useAuthStore = defineStore("authStore", () => {
 
     function SET_Session(payload: SessionType | null) {
         session.value = payload
-        console.log(session.value)
+        console.log("Session store:")
     }
 
     async function handleSignUp(credentials: NewUser) {
         isLoadingSignUp.value = true
 
-        const { data, error } = await authClient.signUp.email(credentials)
+        await sleep(2000)
 
-        isLoadingSignUp.value = false
-        console.log(data)
-        console.log(error)
-        return data
+        try {
+            const { data, error } = await authClient.signUp.email(credentials)
+
+            if (!error) {
+                isLoadingSignUp.value = false
+                return data
+            } else {
+                isLoadingSignUp.value = false
+                return error
+            }
+        } catch (error) {
+            console.log("Erro no login", error)
+            isLoadingSignUp.value = false
+            return error
+        }
     }
 
     async function handleSignIn(credentials: User) {
         isLoadingSignIn.value = true
 
-        const { data, error } = await authClient.signIn.email(credentials)
+        await sleep(2000)
+        try {
+            const { data, error } = await authClient.signIn.email(credentials)
+            if (!error) {
+                const session = await authClient.getSession()
+                SET_Session(session.data)
+                isLoadingSignIn.value = false
 
-        if (!!data) {
-            const session = await authClient.getSession()
-            SET_Session(session.data)
+                return data
+            } else {
+                isLoadingSignIn.value = false
+
+                return error
+            }
+        } catch (err) {
+            console.log("Erro no login.", err)
+            isLoadingSignIn.value = false
+
+            return error
         }
-        return data
     }
 
     async function handleLogout() {
-        const { data, error } = await authClient.signOut()
+        await sleep(2000)
+
+        try {
+            const { data, error } = await authClient.signOut()
+            
+            if (!error) {
+                return data
+            }
+        } catch (error) {
+            
+        }
         SET_Session(null)
 
         return data
@@ -69,8 +127,11 @@ export const useAuthStore = defineStore("authStore", () => {
         GETisLoadingSignIn,
         GETisLoadingSignUp,
         GET_isLoadingPage,
+        isLoadingHeaderIcons,
+        session,
         user,
         isLogged,
+        GETSession,
         SET_Session,
         SETisLoadingPage,
         handleSignUp,
