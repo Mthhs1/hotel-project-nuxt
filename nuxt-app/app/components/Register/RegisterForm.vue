@@ -3,6 +3,7 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import { useAuthStore } from "~/stores/authStore"
 import * as z from "zod"
+import { error } from "#build/ui"
 
 const authStore = useAuthStore()
 
@@ -66,9 +67,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         birthDay: dateStrToTimestamp.parse(event.data.birthDay),
     }
 
-    
-    let response
-
+    let response: Awaited<ReturnType<typeof authStore.handleSignUp>>
     try {
         response = await authStore.handleSignUp(credentials)
     } catch (err) {
@@ -76,20 +75,15 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     }
 
     if (response && response.status >= 400 && response.status <= 500) {
-        if (
-            response.data.message &&
-            response.data.message === "Invalid email or password"
-        ) {
+        if (response.message) {
             toast.add({
-                title: "Erro no Login!",
-                description: "Email ou Senha inválida!",
+                title: "Erro no cadastro!",
+                description: response.message,
                 color: "error",
                 duration: 3000,
             })
-        }    let response
-    }
-
-    if (response && response.user) {
+        }
+    } else if (response == null) {
         toast.add({
             title: "Cadastro bem-sucedido!",
             description: "Você se cadastrou com sucesso.",
@@ -104,7 +98,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 <template>
     <div>
         <UForm
-            :disabled="authStore.GETisLoadingSignUp"
+            :disabled="authStore.GET_isLoadingSignUp"
             class="flex flex-col gap-2 justify-center items-center transition-all duration-75 ease-in-out"
             :state="state"
             :schema="schema"
@@ -179,7 +173,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <USeparator />
 
             <UButton
-                :loading="authStore.GETisLoadingSignIn"
+                :loading="authStore.GET_isLoadingSignUp"
                 label="Entrar"
                 type="submit"
                 class="flex justify-center w-[40%]"

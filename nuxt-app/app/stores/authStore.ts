@@ -18,7 +18,7 @@ type SessionType = typeof authClient.$Infer.Session
 export const useAuthStore = defineStore("authStore", () => {
     let session = ref<SessionType | null>(null)
 
-    async function GETSession() {
+    async function startSession() {
         isLoadingHeaderIcons.value = true
 
         const headers = import.meta.server
@@ -30,25 +30,28 @@ export const useAuthStore = defineStore("authStore", () => {
         })
 
         if (!response.error) {
-            console.log("SUCESSO!")
             SET_Session(response.data)
+            isLoadingHeaderIcons.value = false
+            return true
         } else {
-            console.log("ERRO!")
             console.log(response.error)
+            isLoadingHeaderIcons.value = false
+            return false
         }
-        isLoadingHeaderIcons.value = false
     }
 
     const isLoadingSignIn = ref(false)
     const isLoadingSignUp = ref(false)
+    const isLoadingLogout = ref(false)
     const isLoadingHeaderIcons = ref(false)
     const isLoadingPage = ref(false)
 
-    const GETisLoadingSignIn = computed(() => isLoadingSignIn.value)
+    const GET_isLoadingSignIn = computed(() => isLoadingSignIn.value)
     const GET_isLoadingPage = computed(() => isLoadingPage.value)
-    const GETisLoadingSignUp = computed(() => isLoadingSignUp.value)
-    const isLogged = computed(() => !!session.value?.session)
-    const user = computed(() => session.value?.user)
+    const GET_isLoadingSignUp = computed(() => isLoadingSignUp.value)
+    const GET_isLogged = computed(() => !!session.value?.session)
+    const GET_isLoadingLogout = computed(() => isLoadingLogout.value)
+    const GET_user = computed(() => session.value?.user)
 
     function SETisLoadingPage(value: boolean) {
         isLoadingPage.value = value
@@ -56,83 +59,74 @@ export const useAuthStore = defineStore("authStore", () => {
 
     function SET_Session(payload: SessionType | null) {
         session.value = payload
-        console.log("Session store:")
     }
 
-    async function handleSignUp(credentials: NewUser) {
+    async function handleSignUp(credentials: NewUser): Promise<{
+        code?: string | undefined
+        message?: string | undefined
+        status: number
+        statusText: string
+    } | null | undefined > {
         isLoadingSignUp.value = true
 
         await sleep(2000)
 
-        try {
-            const { data, error } = await authClient.signUp.email(credentials)
+        const response = await authClient.signUp.email(credentials)
 
-            if (!error) {
-                isLoadingSignUp.value = false
-                return data
-            } else {
-                isLoadingSignUp.value = false
-                return error
-            }
-        } catch (error) {
-            console.log("Erro no login", error)
-            isLoadingSignUp.value = false
-            return error
-        }
+        isLoadingSignUp.value = false
+        return response.error
     }
 
-    async function handleSignIn(credentials: User) {
+    async function handleSignIn(credentials: User): Promise<{
+        code?: string | undefined
+        message?: string | undefined
+        status: number
+        statusText: string
+    } | null | undefined> {
         isLoadingSignIn.value = true
 
         await sleep(2000)
-        try {
-            const { data, error } = await authClient.signIn.email(credentials)
-            if (!error) {
-                const session = await authClient.getSession()
-                SET_Session(session.data)
-                isLoadingSignIn.value = false
 
-                return data
-            } else {
-                isLoadingSignIn.value = false
+        const response = await authClient.signIn.email(credentials)
 
-                return error
-            }
-        } catch (err) {
-            console.log("Erro no login.", err)
+        if (!response.error) {
+            const session = await authClient.getSession()
+            SET_Session(session.data)
             isLoadingSignIn.value = false
-
-            return error
         }
+
+        isLoadingSignIn.value = false
+        return response.error
     }
 
     async function handleLogout() {
         await sleep(2000)
 
+        isLoadingLogout.value = true
         try {
             const { data, error } = await authClient.signOut()
-            
+            isLoadingLogout.value = false
             if (!error) {
+                SET_Session(null)
+                isLoadingLogout.value = false
                 return data
             }
         } catch (error) {
-            
+            isLoadingLogout.value = false
+            console.log(error)
         }
-        SET_Session(null)
-
-        return data
     }
 
     return {
-        GETisLoadingSignIn,
-        GETisLoadingSignUp,
+        GET_isLoadingSignIn,
+        GET_isLoadingSignUp,
         GET_isLoadingPage,
+        GET_isLogged,
+        GET_user,
+        GET_isLoadingLogout,
         isLoadingHeaderIcons,
         session,
-        user,
-        isLogged,
-        GETSession,
-        SET_Session,
+        startSession,
         SETisLoadingPage,
         handleSignUp,
         handleSignIn,

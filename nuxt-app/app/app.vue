@@ -3,30 +3,17 @@ import { useAuthStore } from "~/stores/authStore"
 
 import TheSpinner from "./utils/TheSpinner.vue"
 
+const nuxtApp = useNuxtApp()
 const authStore = useAuthStore()
 
-const data = useAsyncData("auth-init", async () => {
-    await authStore.GETSession()
-    return true
+const { data } = await useAsyncData("auth-init", async () => {
+    const response = await authStore.startSession()
+    return response
 })
 
-/*
-onMounted(async () => {
-    try {
-        // Faz a requisição no navegador (sem se preocupar com cookies de SSR)
-        authStore.SETisLoadingPage(true)
-        const { data, error } = await authClient.getSession()
-        console.log("Mounted")
-        console.log(data)
-        if (data) {
-            authStore.SET_Session(data)
-        }
-    } catch (error) {
-        console.error("Erro ao checar sessão:", error)
-    }
-    authStore.SETisLoadingPage(false)
-})
-*/
+console.log(
+    `A resposta para o start inicial foi ${data.value == true ? "verdadeiro" : "falso"}`,
+)
 </script>
 
 <template>

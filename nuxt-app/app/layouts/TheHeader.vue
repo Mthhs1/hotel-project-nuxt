@@ -35,6 +35,7 @@ const items = computed<NavigationMenuItem[]>(() => [
     },
 ])
 
+
 const itemsDropdown = ref<DropdownMenuItem[][]>([
     [
         {
@@ -118,10 +119,10 @@ const itemsDropdown = ref<DropdownMenuItem[][]>([
                 </div>
                 <div v-else>
                     <UButton
-                        v-if="!authStore.isLogged"
+                        v-if="!authStore.GET_isLogged"
                         :loading="
-                            authStore.GETisLoadingSignIn ||
-                            authStore.GETisLoadingSignUp
+                            authStore.GET_isLoadingSignIn ||
+                            authStore.GET_isLoadingSignUp
                         "
                         trailing-icon="tabler:login-2"
                         to="/login"
@@ -130,7 +131,7 @@ const itemsDropdown = ref<DropdownMenuItem[][]>([
                     >
                         Login
                     </UButton>
-                    <UDropdownMenu v-else :items="itemsDropdown">
+                    <UDropdownMenu :loading="authStore.GET_isLoadingLogout" v-else :items="itemsDropdown">
                         <UButton size="xl" icon="tabler:user" />
                     </UDropdownMenu>
                 </div>

@@ -37,8 +37,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         password: event.data.password,
     }
 
-    let response
-
+    let response: Awaited<ReturnType<typeof authStore.handleSignIn>>
     try {
         response = await authStore.handleSignIn(credentials)
     } catch (err) {
@@ -47,8 +46,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     if (response && response.status >= 400 && response.status <= 500) {
         if (
-            response.data.message &&
-            response.data.message === "Invalid email or password"
+            response.message &&
+            response.message === "Invalid email or password"
         ) {
             toast.add({
                 title: "Erro no Login!",
@@ -57,9 +56,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                 duration: 3000,
             })
         }
-    }
-
-    if (response && response.user) {
+    } else if (!!authStore.GET_user) {
         toast.add({
             title: "Login bem-sucedido!",
             description: "Você entrou com sucesso.",
@@ -74,7 +71,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 <template>
     <div>
         <UForm
-            :disabled="authStore.GETisLoadingSignIn"
+            :disabled="authStore.GET_isLoadingSignIn"
             :schema="schema"
             class="flex flex-col gap-4 justify-center items-center"
             :state="state"
@@ -134,8 +131,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             </UContainer>
             <USeparator />
             <UButton
-                :loading="authStore.GETisLoadingSignIn"
-                :disabled="authStore.GETisLoadingSignIn"
+                :loading="authStore.GET_isLoadingSignIn"
+                :disabled="authStore.GET_isLoadingSignIn"
                 label="Entrar"
                 type="submit"
                 class="flex justify-center w-[40%]"
