@@ -3,7 +3,7 @@ import MainLoginView from "~/components/Login/MainLoginView.vue"
 </script>
 
 <template>
-    <div class="flex flex-col min-h-screen">
+    <div class="flex-1">
         <MainLoginView />
     </div>
 </template>

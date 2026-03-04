@@ -2,5 +2,7 @@
 </script>
 
 <template>
-    <div>oi</div>
+    <div>
+        <NuxtPage />
+    </div>
 </template>

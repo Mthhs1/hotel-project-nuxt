@@ -1,25 +1,38 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui"
 
+const visible = ref(false)
+
 const items: NavigationMenuItem[][] = [
     [
         {
             label: "Home",
             icon: "i-lucide-house",
+            to: "/",
         },
         {
             label: "Reserva",
             icon: "i-lucide-inbox",
-            to: "/dashboard/reserva",
+            to: "/dashboard/reservation",
+            children: [
+                {
+                    label: "Ver minhas reservas",
+                    to: "/dashboard/reservation/my",
+                },
+                {
+                    label: "Fazer uma reserva",
+                    to: "/dashboard/reservation/list",
+                },
+            ],
         },
         {
-            label: "Contacts",
+            label: "Meus Dados",
             icon: "i-lucide-users",
         },
         {
             label: "Settings",
             icon: "i-lucide-settings",
-            defaultOpen: true,
+            defaultOpen: false,
             children: [
                 {
                     label: "General",
@@ -55,7 +68,7 @@ const items: NavigationMenuItem[][] = [
 
 <template>
     <div
-        class="flex flex-col md:flex-row gap-6 w-full max-w-7xl mx-auto p-4 md:p-8"
+        class="flex flex-col md:flex-row gap-6 w-full max-w-7xl mx-auto p-4 md:p-8 flex-1"
     >
         <aside
             class="w-full md:w-64 shrink-0 flex flex-col gap-4 border border-gray-200 dark:border-gray-800 rounded-lg p-4 bg-white dark:bg-gray-900"

@@ -10,6 +10,7 @@ export const quarto = sqliteTable("quarto", {
     url: text().notNull(),
     hasDiscount: int({ mode: "boolean" }).$default(() => false),
     roomType: text().notNull(),
+    status: text().notNull().default("available"),
     createdAt: int()
         .notNull()
         .$default(() => Date.now()),
@@ -18,3 +19,5 @@ export const quarto = sqliteTable("quarto", {
         .$default(() => Date.now())
         .$onUpdate(() => Date.now()),
 })
+
+export type Quarto = typeof quarto.$inferSelect

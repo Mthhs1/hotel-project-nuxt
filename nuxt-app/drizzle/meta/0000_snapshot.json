@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e817b5be-96a9-4f4b-84c6-42c46e08ab42",
+  "id": "67da3ef2-1c45-427c-bf69-5b1d4b1f509f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "acessorio": {
@@ -516,6 +516,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'available'"
         },
         "createdAt": {
           "name": "createdAt",

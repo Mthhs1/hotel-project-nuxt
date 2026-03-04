@@ -3,17 +3,19 @@ import { useAuthStore } from "~/stores/authStore"
 
 import TheSpinner from "./utils/TheSpinner.vue"
 
-const nuxtApp = useNuxtApp()
 const authStore = useAuthStore()
 
 const { data } = await useAsyncData("auth-init", async () => {
     const response = await authStore.startSession()
+
+
+    console.log(
+    `A resposta para o start inicial foi ${response ? "verdadeiro" : "falso"}`,
+)
     return response
 })
 
-console.log(
-    `A resposta para o start inicial foi ${data.value == true ? "verdadeiro" : "falso"}`,
-)
+
 </script>
 
 <template>

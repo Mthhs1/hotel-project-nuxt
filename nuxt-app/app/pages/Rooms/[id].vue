@@ -7,7 +7,7 @@ const carouselItems: string[] = reactive([])
 const numberOfImages = 5
 const mapIdToRooms = ["Quarto Luxuoso", "Quarto Padrão", "Quarto Classe Alta"]
 
-const idPageStr = route.params.id
+const idPageStr = route.params.id 
 const idPageIndex = Number(idPageStr)
 const quarto = mapIdToRooms[idPageIndex - 1]
 
@@ -18,7 +18,7 @@ if (idPageIndex < 1 || idPageIndex > 4) {
 let response
 
 try {
-    response = await useFetch("/api/rooms/room", {
+    response = await useFetch("/api/rooms/some", {
         method: "GET",
         query: { quarto },
     })
@@ -34,7 +34,7 @@ const data = response?.data
 </script>
 
 <template>
-    <div>
+    <div class="flex-1">
         <UMain class="flex flex-col gap-4">
             <!-- Row 1 -->
             <div class="relative flex flex-col h-128">

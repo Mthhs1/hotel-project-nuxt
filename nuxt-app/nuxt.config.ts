@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import env from "./app/lib/env"
+
 export default defineNuxtConfig({
     compatibilityDate: "2025-07-15",
     devtools: { enabled: true },
@@ -40,5 +42,11 @@ export default defineNuxtConfig({
 
     devtools: {
         enabled: false, // or false to disable
+    },
+    runtimeConfig: {
+        // Public keys that are exposed to the client
+        public: {
+            BETTER_AUTH_URL: env.BETTER_AUTH_URL,
+        },
     },
 })

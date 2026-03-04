@@ -3,7 +3,7 @@ import MainRegisterView from "~/components/Register/MainRegisterView.vue";
 </script>
 
 <template>
-    <div>
+    <div class="flex-1">
         <MainRegisterView />
     </div>
 </template>

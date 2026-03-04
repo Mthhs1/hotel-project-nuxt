@@ -76,6 +76,7 @@ CREATE TABLE `quarto` (
 	`url` text NOT NULL,
 	`hasDiscount` integer,
 	`roomType` text NOT NULL,
+	`status` text DEFAULT 'available' NOT NULL,
 	`createdAt` integer NOT NULL,
 	`updateAt` integer NOT NULL
 );

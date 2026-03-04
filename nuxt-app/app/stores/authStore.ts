@@ -1,21 +1,22 @@
-import { error } from "#build/ui"
 import { defineStore } from "pinia"
-import { authClient } from "~/lib/auth-client"
+// import { $ } from "~/plugins/auth-client"
 import { sleep } from "~/utils/sleep"
 
-interface User {
-    email: string
-    password: string
-}
-
-interface NewUser extends User {
-    name: string
-    birthDay: number
-}
-
-type SessionType = typeof authClient.$Infer.Session
-
 export const useAuthStore = defineStore("authStore", () => {
+    const { $auth } = useNuxtApp()
+
+    interface User {
+        email: string
+        password: string
+    }
+
+    interface NewUser extends User {
+        name: string
+        birthDay: number
+    }
+
+    type SessionType = typeof $auth.$Infer.Session
+
     let session = ref<SessionType | null>(null)
 
     async function startSession() {
@@ -25,7 +26,15 @@ export const useAuthStore = defineStore("authStore", () => {
             ? useRequestHeaders(["cookie"])
             : undefined
 
-        const response = await authClient.getSession({
+        // console.log("Headers: ", headers)
+
+        if (!headers?.cookie) {
+            // console.log("Headers nulos")
+            isLoadingHeaderIcons.value = false
+            return false
+        }
+
+        const response = await $auth.getSession({
             fetchOptions: { headers: headers },
         })
 
@@ -61,36 +70,44 @@ export const useAuthStore = defineStore("authStore", () => {
         session.value = payload
     }
 
-    async function handleSignUp(credentials: NewUser): Promise<{
-        code?: string | undefined
-        message?: string | undefined
-        status: number
-        statusText: string
-    } | null | undefined > {
+    async function handleSignUp(credentials: NewUser): Promise<
+        | {
+              code?: string | undefined
+              message?: string | undefined
+              status: number
+              statusText: string
+          }
+        | null
+        | undefined
+    > {
         isLoadingSignUp.value = true
 
         await sleep(2000)
 
-        const response = await authClient.signUp.email(credentials)
+        const response = await $auth.signUp.email(credentials)
 
         isLoadingSignUp.value = false
         return response.error
     }
 
-    async function handleSignIn(credentials: User): Promise<{
-        code?: string | undefined
-        message?: string | undefined
-        status: number
-        statusText: string
-    } | null | undefined> {
+    async function handleSignIn(credentials: User): Promise<
+        | {
+              code?: string | undefined
+              message?: string | undefined
+              status: number
+              statusText: string
+          }
+        | null
+        | undefined
+    > {
         isLoadingSignIn.value = true
 
         await sleep(2000)
 
-        const response = await authClient.signIn.email(credentials)
+        const response = await $auth.signIn.email(credentials)
 
         if (!response.error) {
-            const session = await authClient.getSession()
+            const session = await $auth.getSession()
             SET_Session(session.data)
             isLoadingSignIn.value = false
         }
@@ -104,7 +121,7 @@ export const useAuthStore = defineStore("authStore", () => {
 
         isLoadingLogout.value = true
         try {
-            const { data, error } = await authClient.signOut()
+            const { data, error } = await $auth.signOut()
             isLoadingLogout.value = false
             if (!error) {
                 SET_Session(null)

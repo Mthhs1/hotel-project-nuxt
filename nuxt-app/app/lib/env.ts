@@ -1,5 +1,4 @@
 import { z } from "zod"
-import "dotenv/config"
 
 const EnvSchema = z.object({
     NODE_ENV: z.string(),
@@ -26,9 +25,6 @@ type User = z.infer<typeof UserSchema>;
 Equivalente a: { id: string; age: number; email: string; }
 */
 
-// eslint-disable-next-line ts/no-redeclare
 export type EnvSchema = z.infer<typeof EnvSchema>
 
-// Se nao definimos uma variável em .env que esteja aqui, o servidor nao vai abrir
-// eslint-disable-next-line node/prefer-global/process
 export default EnvSchema.parse(process.env)
