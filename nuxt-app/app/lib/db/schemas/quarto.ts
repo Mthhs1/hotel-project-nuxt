@@ -1,3 +1,4 @@
+import { max } from "drizzle-orm"
 import { int, real, sqliteTable, text } from "drizzle-orm/sqlite-core"
 
 export const quarto = sqliteTable("quarto", {
@@ -11,6 +12,10 @@ export const quarto = sqliteTable("quarto", {
     hasDiscount: int({ mode: "boolean" }).$default(() => false),
     roomType: text().notNull(),
     status: text().notNull().default("available"),
+    description: text().notNull(),
+    baseCapacity: int().notNull(),
+    maxCapacity: int().notNull(),
+    extraPersonPrice: real().notNull(),
     createdAt: int()
         .notNull()
         .$default(() => Date.now()),

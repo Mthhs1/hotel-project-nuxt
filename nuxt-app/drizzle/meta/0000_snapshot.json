@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "67da3ef2-1c45-427c-bf69-5b1d4b1f509f",
+  "id": "8b94939f-fb45-4391-95b3-4733d7d82f24",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "acessorio": {
-      "name": "acessorio",
+    "adicionalItem": {
+      "name": "adicionalItem",
       "columns": {
         "id": {
           "name": "id",
@@ -14,78 +14,68 @@
           "notNull": true,
           "autoincrement": true
         },
-        "garage": {
-          "name": "garage",
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "isOptional": {
+          "name": "isOptional",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "nGarage": {
-          "name": "nGarage",
+        "basePrice": {
+          "name": "basePrice",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "miniFridge": {
-          "name": "miniFridge",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "tv": {
-          "name": "tv",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "wifi": {
-          "name": "wifi",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "piscine": {
-          "name": "piscine",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "hydromassage": {
-          "name": "hydromassage",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "foods": {
-          "name": "foods",
+        "icon": {
+          "name": "icon",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        }
+      },
+      "indexes": {
+        "adicionalItem_name_unique": {
+          "name": "adicionalItem_name_unique",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "adicionalRelacao": {
+      "name": "adicionalRelacao",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
         },
-        "drinks": {
-          "name": "drinks",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
+        "adicionalItemId": {
+          "name": "adicionalItemId",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "updateAt": {
-          "name": "updateAt",
+        "quartoId": {
+          "name": "quartoId",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -93,7 +83,99 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "adicionalRelacao_adicionalItemId_adicionalItem_id_fk": {
+          "name": "adicionalRelacao_adicionalItemId_adicionalItem_id_fk",
+          "tableFrom": "adicionalRelacao",
+          "tableTo": "adicionalItem",
+          "columnsFrom": [
+            "adicionalItemId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "adicionalRelacao_quartoId_quarto_id_fk": {
+          "name": "adicionalRelacao_quartoId_quarto_id_fk",
+          "tableFrom": "adicionalRelacao",
+          "tableTo": "quarto",
+          "columnsFrom": [
+            "quartoId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "adicionalConsumido": {
+      "name": "adicionalConsumido",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "adicionalItemId": {
+          "name": "adicionalItemId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reservaId": {
+          "name": "reservaId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "priceAtTime": {
+          "name": "priceAtTime",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "adicionalConsumido_adicionalItemId_adicionalItem_id_fk": {
+          "name": "adicionalConsumido_adicionalItemId_adicionalItem_id_fk",
+          "tableFrom": "adicionalConsumido",
+          "tableTo": "adicionalItem",
+          "columnsFrom": [
+            "adicionalItemId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "adicionalConsumido_reservaId_reserva_id_fk": {
+          "name": "adicionalConsumido_reservaId_reserva_id_fk",
+          "tableFrom": "adicionalConsumido",
+          "tableTo": "reserva",
+          "columnsFrom": [
+            "reservaId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -525,6 +607,34 @@
           "autoincrement": false,
           "default": "'available'"
         },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "baseCapacity": {
+          "name": "baseCapacity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "maxCapacity": {
+          "name": "maxCapacity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "extraPersonPrice": {
+          "name": "extraPersonPrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "createdAt": {
           "name": "createdAt",
           "type": "integer",
@@ -558,13 +668,6 @@
         },
         "quartoId": {
           "name": "quartoId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "acessorioId": {
-          "name": "acessorioId",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -605,6 +708,20 @@
           "notNull": true,
           "autoincrement": false
         },
+        "stayTime": {
+          "name": "stayTime",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "person": {
+          "name": "person",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "status": {
           "name": "status",
           "type": "text",
@@ -629,12 +746,146 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "reserva_acessorioId_acessorio_id_fk": {
-          "name": "reserva_acessorioId_acessorio_id_fk",
+        "reserva_userId_user_id_fk": {
+          "name": "reserva_userId_user_id_fk",
           "tableFrom": "reserva",
-          "tableTo": "acessorio",
+          "tableTo": "user",
           "columnsFrom": [
-            "acessorioId"
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "cardapioItem": {
+      "name": "cardapioItem",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "basePrice": {
+          "name": "basePrice",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updateAt": {
+          "name": "updateAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "cardapioItem_name_unique": {
+          "name": "cardapioItem_name_unique",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "cardapioConsumido": {
+      "name": "cardapioConsumido",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "cardapioItemId": {
+          "name": "cardapioItemId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reservaId": {
+          "name": "reservaId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "priceAtTime": {
+          "name": "priceAtTime",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updateAt": {
+          "name": "updateAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "cardapioConsumido_cardapioItemId_cardapioItem_id_fk": {
+          "name": "cardapioConsumido_cardapioItemId_cardapioItem_id_fk",
+          "tableFrom": "cardapioConsumido",
+          "tableTo": "cardapioItem",
+          "columnsFrom": [
+            "cardapioItemId"
           ],
           "columnsTo": [
             "id"
@@ -642,12 +893,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "reserva_userId_user_id_fk": {
-          "name": "reserva_userId_user_id_fk",
-          "tableFrom": "reserva",
-          "tableTo": "user",
+        "cardapioConsumido_reservaId_reserva_id_fk": {
+          "name": "cardapioConsumido_reservaId_reserva_id_fk",
+          "tableFrom": "cardapioConsumido",
+          "tableTo": "reserva",
           "columnsFrom": [
-            "userId"
+            "reservaId"
           ],
           "columnsTo": [
             "id"

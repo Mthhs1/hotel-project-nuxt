@@ -1,5 +1,4 @@
 import { defineStore } from "pinia"
-// import { $ } from "~/plugins/auth-client"
 import { sleep } from "~/utils/sleep"
 
 export const useAuthStore = defineStore("authStore", () => {

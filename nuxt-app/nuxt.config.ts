@@ -39,7 +39,14 @@ export default defineNuxtConfig({
             mode: "out-in",
         },
     },
-
+    nitro: {
+        experimental: {
+            tasks: true,
+        },
+        scheduledTasks: {
+            "*/1 * * * *": ["cleanPendingReservations"], // Run every 1 minute
+        }
+    },
     devtools: {
         enabled: false, // or false to disable
     },

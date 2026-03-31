@@ -109,9 +109,6 @@ const items: NavigationMenuItem[][] = [
                 class="border-t border-gray-200 dark:border-gray-800 pt-4 mt-2"
             >
                 <UButton
-                    :avatar="{
-                        src: 'https://github.com/benjamincanac.png',
-                    }"
                     label="Benjamin"
                     color="neutral"
                     variant="ghost"
@@ -121,9 +118,9 @@ const items: NavigationMenuItem[][] = [
         </aside>
 
         <main
-            class="flex-1 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-800 p-6"
+            class="relative flex-1 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-800 p-6"
         >
-            <NuxtPage />
+            <NuxtPage class=""/>
         </main>
     </div>
 </template>

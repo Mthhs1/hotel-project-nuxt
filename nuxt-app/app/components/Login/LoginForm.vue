@@ -9,7 +9,6 @@ const showPass = ref(false)
 
 const schema = z.object({
     email: z.email("Email inválido"),
-
     password: z
         .string("Senha requerida.")
         .min(8, "Sua senha deve ter pelo menos 6 caracteres"),
@@ -38,9 +37,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     }
 
     let response: Awaited<ReturnType<typeof authStore.handleSignIn>>
+
     try {
         response = await authStore.handleSignIn(credentials)
     } catch (err) {
+        console.log("Try/catch error: loginForm.vue")
         console.log(err)
     }
 

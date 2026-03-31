@@ -1,16 +1,27 @@
-CREATE TABLE `acessorio` (
+CREATE TABLE `adicionalItem` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`garage` integer NOT NULL,
-	`nGarage` integer NOT NULL,
-	`miniFridge` integer NOT NULL,
-	`tv` integer NOT NULL,
-	`wifi` integer NOT NULL,
-	`piscine` integer NOT NULL,
-	`hydromassage` integer NOT NULL,
-	`foods` text,
-	`drinks` text,
-	`createdAt` integer NOT NULL,
-	`updateAt` integer NOT NULL
+	`name` text NOT NULL,
+	`isOptional` integer NOT NULL,
+	`basePrice` integer NOT NULL,
+	`icon` text
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `adicionalItem_name_unique` ON `adicionalItem` (`name`);--> statement-breakpoint
+CREATE TABLE `adicionalRelacao` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`adicionalItemId` integer NOT NULL,
+	`quartoId` integer NOT NULL,
+	FOREIGN KEY (`adicionalItemId`) REFERENCES `adicionalItem`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`quartoId`) REFERENCES `quarto`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE TABLE `adicionalConsumido` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`adicionalItemId` integer NOT NULL,
+	`reservaId` integer NOT NULL,
+	`priceAtTime` integer NOT NULL,
+	FOREIGN KEY (`adicionalItemId`) REFERENCES `adicionalItem`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`reservaId`) REFERENCES `reserva`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `account` (
@@ -77,6 +88,10 @@ CREATE TABLE `quarto` (
 	`hasDiscount` integer,
 	`roomType` text NOT NULL,
 	`status` text DEFAULT 'available' NOT NULL,
+	`description` text NOT NULL,
+	`baseCapacity` integer NOT NULL,
+	`maxCapacity` integer NOT NULL,
+	`extraPersonPrice` real NOT NULL,
 	`createdAt` integer NOT NULL,
 	`updateAt` integer NOT NULL
 );
@@ -84,14 +99,36 @@ CREATE TABLE `quarto` (
 CREATE TABLE `reserva` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`quartoId` integer NOT NULL,
-	`acessorioId` integer NOT NULL,
 	`userId` integer NOT NULL,
 	`checkIn` integer,
 	`checkOut` integer,
 	`createdAt` integer NOT NULL,
 	`updateAt` integer NOT NULL,
+	`stayTime` integer NOT NULL,
+	`person` integer NOT NULL,
 	`status` text DEFAULT 'pending' NOT NULL,
 	FOREIGN KEY (`quartoId`) REFERENCES `quarto`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`acessorioId`) REFERENCES `acessorio`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE TABLE `cardapioItem` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text NOT NULL,
+	`category` text NOT NULL,
+	`basePrice` text NOT NULL,
+	`createdAt` integer NOT NULL,
+	`updateAt` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `cardapioItem_name_unique` ON `cardapioItem` (`name`);--> statement-breakpoint
+CREATE TABLE `cardapioConsumido` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`cardapioItemId` integer NOT NULL,
+	`reservaId` integer NOT NULL,
+	`quantity` integer DEFAULT 1 NOT NULL,
+	`priceAtTime` integer NOT NULL,
+	`createdAt` integer NOT NULL,
+	`updateAt` integer NOT NULL,
+	FOREIGN KEY (`cardapioItemId`) REFERENCES `cardapioItem`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`reservaId`) REFERENCES `reserva`(`id`) ON UPDATE no action ON DELETE no action
 );

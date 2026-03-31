@@ -5,11 +5,20 @@ const router = useRouter()
 const carouselItems: string[] = reactive([])
 
 const numberOfImages = 5
-const mapIdToRooms = ["Quarto Luxuoso", "Quarto Padrão", "Quarto Classe Alta"]
 
-const idPageStr = route.params.id 
+interface Map {
+    [key: number]: string
+}
+
+const mapIdToRooms: Map = {
+    1: "Quarto Luxuoso",
+    2: "Quarto Padrão",
+    3: "Quarto Classe Alta",
+}
+
+const idPageStr = route.params.id
 const idPageIndex = Number(idPageStr)
-const quarto = mapIdToRooms[idPageIndex - 1]
+const quarto = mapIdToRooms[idPageIndex]
 
 if (idPageIndex < 1 || idPageIndex > 4) {
     router.push("/")
@@ -20,7 +29,7 @@ let response
 try {
     response = await useFetch("/api/rooms/some", {
         method: "GET",
-        query: { quarto },
+        query: { by: "roomType", identifier: quarto },
     })
 
     for (let i = 2; i < numberOfImages + 1; i++) {

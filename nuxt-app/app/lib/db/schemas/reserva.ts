@@ -1,6 +1,5 @@
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core"
 
-import { acessorio } from "./acessorio"
 import { user } from "./auth-schema"
 import { quarto } from "./quarto"
 
@@ -9,9 +8,6 @@ export const reserva = sqliteTable("reserva", {
     quartoId: int()
         .notNull()
         .references(() => quarto.id),
-    acessorioId: int()
-        .notNull()
-        .references(() => acessorio.id),
     userId: int()
         .notNull()
         .references(() => user.id),
@@ -24,5 +20,10 @@ export const reserva = sqliteTable("reserva", {
         .notNull()
         .$default(() => Date.now())
         .$onUpdate(() => Date.now()),
+    stayTime: int().notNull(),
+    person: int().notNull(),
     status: text().notNull().default("pending"),
 })
+
+export type Reserva = typeof reserva.$inferSelect
+
