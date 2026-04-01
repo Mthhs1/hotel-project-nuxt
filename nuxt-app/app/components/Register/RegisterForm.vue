@@ -3,7 +3,6 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import { useAuthStore } from "~/stores/authStore"
 import * as z from "zod"
-import { error } from "#build/ui"
 
 const authStore = useAuthStore()
 

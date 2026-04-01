@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { CheckboxGroupItem } from "@nuxt/ui"
-import { type AdicionalItem, type Quarto, type Reserva } from "~/lib/db/schemas"
-import { FetchError } from 'ofetch'
+import type { FormSubmitEvent } from "@nuxt/ui"
+import { type AdicionalItem, type Quarto } from "~/lib/db/schemas"
+import { FetchError } from "ofetch"
+import * as z from "zod"
+
+const toast = useToast()
 
 const props = defineProps<{
     room: Quarto | undefined
@@ -15,24 +19,50 @@ interface ExtractOptions {
     additionals: string[]
 }
 
+const schema = z
+    .object({
+        hours: z.string().min(1, "Selecione a duração da estadia."),
+        guests: z.number().min(1, "Selecione o número de hóspedes."),
+        isGarageSelected: z.boolean(),
+        numberGarage: z.number(),
+        additionals: z.array(z.string()),
+    })
+    .refine(
+        (data) => {
+            if (data.isGarageSelected) {
+                return data.numberGarage > 0
+            }
+            return true
+        },
+        {
+            message: "Se deseja vaga na garagem, deve selecionar a quantidade.",
+            path: ["numberGarage"],
+        },
+    )
+    .transform((data) => {
+        if (data.isGarageSelected) {
+            return data
+        } else {
+            data.numberGarage = 0
+            return data
+        }
+    })
+
+type Schema = z.infer<typeof schema>
+
+const state = reactive<Partial<Schema>>({
+    hours: "",
+    guests: 0,
+    isGarageSelected: false,
+    numberGarage: 0,
+    additionals: [],
+})
+
 const emits = defineEmits<{
     (event: "extract-change", payload: ExtractOptions): void
 }>()
 
 const hourItems = ref(["2 horas", "4 horas", "6 horas", "8 horas", "Per noite"])
-const hourValue = ref("")
-
-const numberGuests = ref(1)
-const numberGarage = ref(0)
-const valueGarage = ref(false)
-
-function handleGarageNumberIsDisable() {
-    if (!valueGarage.value) {
-        numberGarage.value = 0
-    } else {
-        numberGarage.value = 1
-    }
-}
 
 const itemsCheckboxGroupAdicionais = ref<CheckboxGroupItem[]>([
     {
@@ -52,8 +82,7 @@ const itemsCheckboxGroupAdicionais = ref<CheckboxGroupItem[]>([
     },
 ])
 
-const valueAdditionals = ref<Array<string>>([])
-
+/*
 const allOptions = computed<ExtractOptions>(() => {
     return {
         garage: [valueGarage.value, numberGarage.value],
@@ -62,49 +91,74 @@ const allOptions = computed<ExtractOptions>(() => {
         additionals: valueAdditionals.value,
     }
 })
+    
 
 watch(allOptions, (newVal) => {
     emits("extract-change", newVal)
 })
+*/
+async function onSubmitForm(event: FormSubmitEvent<Schema>) {
 
-async function onSubmitForm () {
-    
     const body = {
         quartoId: props.room?.id,
-        person: numberGuests.value,
-        stayTime: hourValue.value,
-        additionals: [...valueAdditionals.value],
+        person: event.data.guests,
+        stayTime: event.data.hours,
+        additionals: [...event.data.additionals],
     }
 
     console.log(body)
 
     try {
-        const response = await $fetch("/api/reservation/new",{
+        const response = await $fetch("/api/reservation/new", {
             method: "POST",
             body,
         })
-        console.log(response)
+
+        if (response) {
+            toast.add({
+                title: "Reserva criada com sucesso!",
+                description:
+                    "Sua reserva foi criada e está pendente de confirmação.",
+                color: "success",
+                duration: 3000,
+            })
+
+            navigateTo("/dashboard/reservation/my")
+        }
     } catch (error: FetchError | unknown) {
         if (error instanceof FetchError) {
             console.error("FetchError:", error.message, "Status:", error.status)
+            toast.add({
+                title: "Erro ao criar reserva!",
+                description:
+                    error.data?.message || "Ocorreu um erro inesperado.",
+                color: "error",
+                duration: 3000,
+            })
+            navigateTo("/dashboard/reservation/my")
         } else {
             console.error("Unexpected error:", error)
         }
     }
 }
-
 </script>
 
 <template>
     <div class="p-4 bg-white rounded-sm border border-gray-200 relative">
-        <UForm class="flex flex-col gap-5" @submit="onSubmitForm">
+        <UForm
+            class="flex flex-col gap-5"
+            :state="state"
+            :schema="schema"
+            @submit="onSubmitForm"
+        >
             <!-- Horas -->
             <UFormField
                 :required="true"
                 label="Quantas horas será sua estadia?"
+                name="hours"
             >
                 <USelect
-                    v-model="hourValue"
+                    v-model="state.hours"
                     :items="hourItems"
                     arrow
                     placeholder="Horas"
@@ -112,10 +166,14 @@ async function onSubmitForm () {
             </UFormField>
 
             <!-- Qntd Hóspedes -->
-            <UFormField :required="true" label="Número de hóspedes">
+            <UFormField
+                :required="true"
+                label="Número de hóspedes"
+                name="guests"
+            >
                 <UInputNumber
                     variant="soft"
-                    v-model="numberGuests"
+                    v-model="state.guests"
                     :min="1"
                     :max="5"
                 />
@@ -123,42 +181,46 @@ async function onSubmitForm () {
 
             <!-- Garagem -->
             <div class="flex items-center gap-12 h-12">
+                <!-- Garagem booleano -->
                 <UFormField
                     class="flex items-center"
                     label="Deseja vaga na garagem?"
                     orientation="horizontal"
+                    name="isGarageSelected"
                 >
-                    <UCheckbox
-                        v-model="valueGarage"
-                        @update:model-value="handleGarageNumberIsDisable"
-                    />
+                    <UCheckbox v-model="state.isGarageSelected" />
                 </UFormField>
 
+                <!-- Garagem número -->
                 <Transition>
                     <UFormField
-                        v-if="valueGarage"
+                        v-if="state.isGarageSelected"
                         label="Quantas?"
                         orientation="horizontal"
+                        name="numberGarage"
                     >
                         <UInputNumber
                             :ui="{ base: 'w-16' }"
                             :increment="false"
                             :decrement="false"
-                            :min="1"
+                            :min="0"
                             :max="5"
                             variant="soft"
-                            v-model="numberGarage"
-                            :disabled="!valueGarage"
+                            v-model="state.numberGarage"
+                            :disabled="!state.isGarageSelected"
                         />
                     </UFormField>
                 </Transition>
             </div>
 
             <!-- Adicionais opcionais -->
-            <UFormField label="Deseja algum adicional para a sua estadia?">
+            <UFormField
+                label="Deseja algum adicional para a sua estadia?"
+                name="additionals"
+            >
                 <UCheckboxGroup
-                    @change="console.log(valueAdditionals)"
-                    v-model="valueAdditionals"
+                    @change="console.log(state.additionals)"
+                    v-model="state.additionals"
                     :items="itemsCheckboxGroupAdicionais"
                 />
             </UFormField>

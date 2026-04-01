@@ -8,6 +8,18 @@ import {
 } from "../../../app/lib/db/schemas/index"
 import { eq, and } from "drizzle-orm"
 
+interface MapHoursToPrice {
+    [key: string]: number
+}
+
+const mapHoursToPrice: MapHoursToPrice = {
+    "2 horas": 2,
+    "4 horas": 4,
+    "6 horas": 6,
+    "8 horas": 8,
+    "Pernoite": 12,
+}
+
 export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession({
         headers: event.headers, // headers containing the user's session token
@@ -32,9 +44,9 @@ export default defineEventHandler(async (event) => {
                 {
                     quartoId: body.quartoId,
                     userId: userId,
-                    checkIn: Date.now(),
+                    checkIn: null,
                     checkOut: null,
-                    stayTime: body.stayTime,
+                    stayTime: mapHoursToPrice[body.stayTime] || 0,
                     person: body.person,
                     status: "pending",
                 }

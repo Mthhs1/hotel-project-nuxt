@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ReservationList from "~/components/dashboard/reservation/reservationList.vue"
+import ReservationListAvailable from "~/components/dashboard/reservation/list/reservationListAvailable.vue"
 import { type Quarto } from "~/lib/db/schemas/quarto"
 import { type AdicionalItem } from "~/lib/db/schemas/adicionalItem"
 
@@ -93,7 +93,7 @@ function handleReserveButtonClick() {
             </UContainer>
 
             <UContainer>
-                <ReservationList
+                <ReservationListAvailable
                     :rooms="rooms"
                     @selected-room-event="
                         (value: number | null) => {

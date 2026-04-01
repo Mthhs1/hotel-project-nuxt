@@ -26,7 +26,7 @@ export default defineTask({
             }
         }
         
-        console.log(`Cleaned ${cleanedCount} pending reservations.`)
+        console.log(`Cleaned ${cleanedCount} pending reservations of ${reservations.length}.`)
         return { result: "Success" }
     },
 })

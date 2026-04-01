@@ -44,7 +44,7 @@ export default defineNuxtConfig({
             tasks: true,
         },
         scheduledTasks: {
-            "*/1 * * * *": ["cleanPendingReservations"], // Run every 1 minute
+            "*/15 * * * *": ["cleanPendingReservations"], // Run every 5 minutes
         }
     },
     devtools: {

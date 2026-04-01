@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type Quarto, type AdicionalItem } from "~/lib/db/schemas"
 
-import ReservationItem from "./reservationItem.vue"
+import ReservationItemAvailable from "./reservationItemAvailable.vue"
 
 const props = defineProps({
     rooms: Object as () => { quarto: Quarto; adicionais: AdicionalItem[] }[],
@@ -20,7 +20,6 @@ function changeSelectedRoom(bool: boolean | string, id: number): void {
         emits("selectedRoomEvent", selectedRoom.value)
     }
 }
-
 </script>
 
 <template>
@@ -32,10 +31,11 @@ function changeSelectedRoom(bool: boolean | string, id: number): void {
             <UCheckbox
                 :model-value="selectedRoom === roomObj.quarto.id"
                 @update:model-value="
-                    (bool) => changeSelectedRoom(bool, roomObj.quarto.id)
+                    (bool: boolean) =>
+                        changeSelectedRoom(bool, roomObj.quarto.id)
                 "
             />
-            <ReservationItem
+            <ReservationItemAvailable
                 class="flex-1"
                 :key="roomObj.quarto.id"
                 :room-type="roomObj.quarto.roomType"
