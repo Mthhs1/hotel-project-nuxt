@@ -22,3 +22,20 @@ Resolvi, após um tempo, então, dar continuidade ao projeto, porém refatorando
 ## Hospedagem
 
 Um protótipo do projeto está hospedado no Vercel, e pode ser acessado através do seguinte link: [Hotel Project Nuxt](https://hotel-project-nuxt.vercel.app/).
+
+# Task list
+
+- [x] Finalizar a as páginas iniciais do projeto
+- [x] Adicionar Dark Mode
+- [x] Implementar autenticação de usuários (Registro, Login, Logout)
+- [x] Conexão com o banco de dados utilizando Drizzle ORM
+- [x] Implementar a lista de quartos disponíveis
+- [x] Implementar a funcionalidade de reserva de quartos
+- [ ] Implementar a funcionalidade de gerenciamento de reservas (visualizar, editar, cancelar)
+- [ ] Implementar uma página de extrato de uma reserva.
+- [ ] Implementar a funcionalidade de gerenciamento de hóspedes (visualizar, editar, excluir)
+- [ ] Implementar a funcionalidade de gerenciamento de funcionários (visualizar, editar, excluir)
+- [ ] Implementar edição de perfil para os usuários
+- [ ] Adicionar suporte para dispositivos móveis (responsividade)
+- [ ] Adicionar modos de Admin/Funcionário/Cliente com diferentes níveis de acesso
+- [ ] Finalizar Dashboard do projeto
