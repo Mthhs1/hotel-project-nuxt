@@ -20,7 +20,7 @@ export default defineTask({
             const reservationCreatedAtPlusTwoHours = reservationCreatedAt + 5* 60 * 1000
 
             if (Date.now() > reservationCreatedAtPlusTwoHours) {
-                await db.update(reserva).set({status: "cancelled by system (time)"}).where(eq(reserva.id, reservation.id))
+                await db.update(reserva).set({status: "cancelled"}).where(eq(reserva.id, reservation.id))
                 console.log(`Cancelled reservation with id ${reservation.id} due to timeout.`)
                 cleanedCount++
             }

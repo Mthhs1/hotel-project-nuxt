@@ -27,19 +27,18 @@ const isExtractBlank = computed(() => {
 </script>
 
 <template>
-    <div v-if="!isExtractBlank" class="text-sm text-gray-700 flex flex-col gap-4">
-        <!-- Garagem -->
+    <div
+        v-if="!isExtractBlank"
+        class="text-sm text-gray-700 flex flex-col gap-4 border rounded-sm p-4 shadow-sm/1"
+    >
         <h3 class="text-xl">Adicionais</h3>
-        <div>
-            <div v-if="isGarageSelected" class="flex justify-between">
-                <span>Garagem: {{ numberGarage }}</span
-                ><span
-                    >Valor:
-                    {{
-                        (additionalsPrice["Garagem"]?.basePrice ?? 0) * numberGarage
-                    }}</span
-                >
+        <div class="">
+            <!-- Horas -->
+            <div v-if="hours" class="flex justify-between">
+                <span>Horas: {{ hours }}</span
+                ><span>Valor: {{ hoursPrice || 0 }}</span>
             </div>
+
             <!-- hóspedes -->
             <div v-if="guestsExceedBaseCapacity" class="flex justify-between">
                 <span>Convidados: {{ guests }}</span
@@ -51,11 +50,19 @@ const isExtractBlank = computed(() => {
                     }}</span
                 >
             </div>
-            <!-- Horas -->
-            <div v-if="hours" class="flex justify-between">
-                <span>Horas: {{ hours }}</span
-                ><span>Valor: {{ hoursPrice || 0 }}</span>
+
+            <!-- Garagem -->
+            <div v-if="isGarageSelected" class="flex justify-between">
+                <span>Garagem: {{ numberGarage }}</span
+                ><span
+                    >Valor:
+                    {{
+                        (additionalsPrice["Garagem"]?.basePrice ?? 0) *
+                        numberGarage
+                    }}</span
+                >
             </div>
+
             <!-- Adicionais -->
             <div v-if="additionals.length > 0">
                 <div
@@ -65,7 +72,8 @@ const isExtractBlank = computed(() => {
                 >
                     <span>{{ additional }}</span
                     ><span
-                        >Valor: {{ additionalsPrice[additional]?.basePrice }}</span
+                        >Valor:
+                        {{ additionalsPrice[additional]?.basePrice }}</span
                     >
                 </div>
             </div>

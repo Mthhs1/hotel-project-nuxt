@@ -3,7 +3,13 @@ import env from "./app/lib/env"
 
 export default defineNuxtConfig({
     compatibilityDate: "2025-07-15",
-    devtools: { enabled: true },
+    devtools: {
+      enabled: true,
+
+      timeline: {
+        enabled: true,
+      },
+    },
     modules: [
         "@nuxt/eslint",
         "@nuxt/fonts",
@@ -47,7 +53,12 @@ export default defineNuxtConfig({
             "*/15 * * * *": ["cleanPendingReservations"], // Run every 5 minutes
         }
     },
+    
     devtools: {
+        /*
+        timeline: {
+            enabled: false,
+        },*/
         enabled: false, // or false to disable
     },
     runtimeConfig: {

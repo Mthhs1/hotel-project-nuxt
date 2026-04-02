@@ -10,9 +10,11 @@ type quartoWithAdditionals = {
 }
 
 export default defineEventHandler(async (event) => {
-    console.log("Requisitando parâmetros do evento")
+    console.log("Requisitando parâmetros do evento para a listagem de quartos")
     const query = await getQuery(event)
     const getRoomName = String(query.quarto)
+
+    console.log(event.headers)
 
     const itemsPerPage = Number(query.itemsPerPage)
     const page = Number(query.page)

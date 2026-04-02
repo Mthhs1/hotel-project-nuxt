@@ -12,13 +12,6 @@ const props = defineProps<{
     additionals: AdicionalItem[] | undefined
 }>()
 
-interface ExtractOptions {
-    garage: [boolean, number]
-    guests: number
-    hours: string
-    additionals: string[]
-}
-
 const schema = z
     .object({
         hours: z.string().min(1, "Selecione a duração da estadia."),
@@ -35,7 +28,7 @@ const schema = z
             return true
         },
         {
-            message: "Se deseja vaga na garagem, deve selecionar a quantidade.",
+            message: "",
             path: ["numberGarage"],
         },
     )
@@ -58,10 +51,6 @@ const state = reactive<Partial<Schema>>({
     additionals: [],
 })
 
-const emits = defineEmits<{
-    (event: "extract-change", payload: ExtractOptions): void
-}>()
-
 const hourItems = ref(["2 horas", "4 horas", "6 horas", "8 horas", "Per noite"])
 
 const itemsCheckboxGroupAdicionais = ref<CheckboxGroupItem[]>([
@@ -82,21 +71,10 @@ const itemsCheckboxGroupAdicionais = ref<CheckboxGroupItem[]>([
     },
 ])
 
-/*
-const allOptions = computed<ExtractOptions>(() => {
-    return {
-        garage: [valueGarage.value, numberGarage.value],
-        guests: numberGuests.value,
-        hours: hourValue.value,
-        additionals: valueAdditionals.value,
-    }
+watch(state, (newVal) => {
+    emits("extract-change", newVal as Schema)
 })
-    
 
-watch(allOptions, (newVal) => {
-    emits("extract-change", newVal)
-})
-*/
 async function onSubmitForm(event: FormSubmitEvent<Schema>) {
 
     const body = {
@@ -141,6 +119,10 @@ async function onSubmitForm(event: FormSubmitEvent<Schema>) {
         }
     }
 }
+
+const emits = defineEmits<{
+    (event: "extract-change", payload: Schema): void
+}>()
 </script>
 
 <template>
@@ -198,6 +180,10 @@ async function onSubmitForm(event: FormSubmitEvent<Schema>) {
                         label="Quantas?"
                         orientation="horizontal"
                         name="numberGarage"
+                        class="flex items-center justify-center"
+                        :error="
+                            state.numberGarage === 0 && state.isGarageSelected
+                        "
                     >
                         <UInputNumber
                             :ui="{ base: 'w-16' }"

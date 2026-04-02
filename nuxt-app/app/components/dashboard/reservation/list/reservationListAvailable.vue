@@ -31,7 +31,7 @@ function changeSelectedRoom(bool: boolean | string, id: number): void {
             <UCheckbox
                 :model-value="selectedRoom === roomObj.quarto.id"
                 @update:model-value="
-                    (bool: boolean) =>
+                    (bool: boolean | string) =>
                         changeSelectedRoom(bool, roomObj.quarto.id)
                 "
             />

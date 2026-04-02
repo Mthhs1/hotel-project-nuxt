@@ -14,6 +14,7 @@ const buttonColor = ref("neutral")
 
 const response = await useAsyncData("get-first-rooms", async () => {
     const response = await $fetch("/api/rooms/all", {
+        headers: useRequestHeaders(),
         method: "GET",
         query: { itemsPerPage: itemsPerPage.value, page: page.value },
     })
