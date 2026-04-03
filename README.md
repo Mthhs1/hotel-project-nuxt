@@ -32,7 +32,7 @@ Um protótipo do projeto está hospedado no Vercel, e pode ser acessado através
 - [x] Implementar a lista de quartos disponíveis
 - [x] Implementar a funcionalidade de reserva de quartos
 - [ ] Implementar a funcionalidade de gerenciamento de reservas (visualizar, editar, cancelar)
-- [ ] Implementar uma página de extrato de uma reserva.
+- [x] Implementar uma página de extrato de uma reserva.
 - [ ] Implementar a funcionalidade de gerenciamento de hóspedes (visualizar, editar, excluir)
 - [ ] Implementar a funcionalidade de gerenciamento de funcionários (visualizar, editar, excluir)
 - [ ] Implementar edição de perfil para os usuários

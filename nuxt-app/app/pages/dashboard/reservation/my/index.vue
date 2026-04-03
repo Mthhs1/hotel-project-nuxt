@@ -8,15 +8,13 @@ const response = await useAsyncData("get-my-all-reservations", async () => {
         query: {
             by: "id",
         },
-        headers: useRequestHeaders(),
+        headers: useRequestHeaders(["cookie"]),
     })
 
     return { reservations: responseReservations }
 })
 
-const reservations = ref(response.data.value?.reservations || [])
-// const itemsSorting = ref(["Data", "Status"])
-// const itemsAscending = ref(["Ascendente", "Descendente"])
+const reservations = ref(response.data.value?.reservations)
 
 const itemsSorting = ref<SelectItem[]>([
     {

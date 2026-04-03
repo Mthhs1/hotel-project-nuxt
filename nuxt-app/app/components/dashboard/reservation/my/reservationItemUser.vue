@@ -5,11 +5,6 @@ const props = defineProps<{
     roomType: string
     status: string
     id: number
-    // basePrice: Number
-    // id: Number
-    // url: String
-    // icons: Array<String>
-    // additionals: Array<AdicionalItem>
 }>()
 
 const expandable = ref(false)
@@ -46,15 +41,15 @@ interface MapStrToText {
 }
 
 const mapStatusToColor = reactive<MapStrToColor>({
-    "reserved": "success",
-    "pending": "warning",
-    "cancelled": "error",
+    reserved: "success",
+    pending: "warning",
+    cancelled: "error",
 })
 
 const mapStatusToText: MapStrToText = {
-    "reserved": "Reservado",
-    "pending": "Pendente",
-    "cancelled": "Cancelado",
+    reserved: "Reservado",
+    pending: "Pendente",
+    cancelled: "Cancelado",
 }
 </script>
 
@@ -64,17 +59,22 @@ const mapStatusToText: MapStrToText = {
             <template #header>
                 <div class="flex flex-row justify-between">
                     <div class="flex">
-                        <UButton
-                            icon="tabler:chevron-down"
-                            variant="ghost"
-                            @click="changeExpandable"
-                        />
                         <h4 class="font-bold">{{ props.roomType }}</h4>
                     </div>
-                    {{ props.id }}
-                    <UBadge class="" :color="mapStatusToColor[props.status]">{{
-                        mapStatusToText[props.status]
-                    }}</UBadge>
+                    <div class="flex gap-12">
+                        <UButton
+                            as="button"
+                            :to="`/dashboard/reservation/my/${props.id}`"
+                            color="primary"
+                            class="p-1 w-24 flex justify-center"
+                            >Ver detalhes
+                        </UButton>
+                        <UBadge
+                            class=""
+                            :color="mapStatusToColor[props.status]"
+                            >{{ mapStatusToText[props.status] }}</UBadge
+                        >
+                    </div>
                 </div>
             </template>
         </UCard>

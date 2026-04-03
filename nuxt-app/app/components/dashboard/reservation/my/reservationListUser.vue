@@ -7,8 +7,6 @@ const props = defineProps<{
     reservations: Array<{ reserva: Reserva; quarto: Quarto | null }> | undefined
 }>()
 
-
-
 const emits = defineEmits(["selectedRoomEvent"])
 
 const selectedRoom = ref<Number | null>(null)
