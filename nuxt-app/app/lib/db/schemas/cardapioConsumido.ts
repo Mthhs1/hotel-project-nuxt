@@ -20,3 +20,5 @@ export const cardapioConsumido = sqliteTable("cardapioConsumido", {
         .$onUpdate(() => Date.now())
         .$onUpdate(() => Date.now()),
 })
+
+export type CardapioConsumido = typeof cardapioConsumido.$inferSelect

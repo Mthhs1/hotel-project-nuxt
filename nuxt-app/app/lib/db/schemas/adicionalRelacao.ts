@@ -7,3 +7,5 @@ export const adicionalRelacao = sqliteTable("adicionalRelacao", {
     adicionalItemId: int().notNull().references(()=> adicionalItem.id),
     quartoId: int().notNull().references(()=> quarto.id)
 })
+
+export type AdicionalRelacao = typeof adicionalRelacao.$inferSelect

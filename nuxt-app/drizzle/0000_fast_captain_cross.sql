@@ -2,8 +2,10 @@ CREATE TABLE `adicionalItem` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`isOptional` integer NOT NULL,
+	`description` text NOT NULL,
 	`basePrice` integer NOT NULL,
-	`icon` text
+	`icon` text,
+	`selectionType` text NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `adicionalItem_name_unique` ON `adicionalItem` (`name`);--> statement-breakpoint
@@ -19,6 +21,7 @@ CREATE TABLE `adicionalConsumido` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`adicionalItemId` integer NOT NULL,
 	`reservaId` integer NOT NULL,
+	`quantity` integer NOT NULL,
 	`priceAtTime` integer NOT NULL,
 	FOREIGN KEY (`adicionalItemId`) REFERENCES `adicionalItem`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`reservaId`) REFERENCES `reserva`(`id`) ON UPDATE no action ON DELETE no action

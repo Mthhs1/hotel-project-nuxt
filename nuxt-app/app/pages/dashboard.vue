@@ -12,6 +12,7 @@ const items: NavigationMenuItem[][] = [
         },
         {
             label: "Reserva",
+            defaultOpen: true,
             icon: "i-lucide-inbox",
             to: "/dashboard/reservation",
             children: [

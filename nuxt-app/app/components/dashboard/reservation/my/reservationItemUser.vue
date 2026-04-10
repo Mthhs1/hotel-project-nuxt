@@ -61,7 +61,7 @@ const mapStatusToText: MapStrToText = {
                     <div class="flex">
                         <h4 class="font-bold">{{ props.roomType }}</h4>
                     </div>
-                    <div class="flex gap-12">
+                    <div class="flex gap-4">
                         <UButton
                             as="button"
                             :to="`/dashboard/reservation/my/${props.id}`"
