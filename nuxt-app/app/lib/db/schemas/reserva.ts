@@ -9,8 +9,9 @@ export const reserva = sqliteTable("reserva", {
         .notNull()
         .references(() => quarto.id),
     userId: int()
-        .notNull()
         .references(() => user.id),
+    firstName: text(),
+    lastName: text(),
     checkIn: int(),
     checkOut: int(),
     createdAt: int()
