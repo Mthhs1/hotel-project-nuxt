@@ -1,6 +1,8 @@
 import { seedRooms } from "./quartoSeed"
 import { seedAdicionalItem } from "./adicionalItemSeed"
 import { seedAdicionalRelation } from "./adicionalRelacaoSeed"
+import { seedReservas } from "./reservaSeed"
+import { seedAdicionalConsumido } from "./adicionalConsumidoSeed"
 
 async function runAllSeeds() {
     
@@ -9,6 +11,8 @@ async function runAllSeeds() {
         await seedRooms()
         await seedAdicionalItem()
         await seedAdicionalRelation()
+        await seedReservas()
+        await seedAdicionalConsumido()
 
         console.log("Inserção no BD Feita com sucesso!")
     } catch (err) {
