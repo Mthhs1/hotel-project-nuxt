@@ -14,8 +14,6 @@ export default defineEventHandler(async (event) => {
     const query = await getQuery(event)
     const getRoomName = String(query.quarto)
 
-    console.log(event.headers)
-
     const itemsPerPage = Number(query.itemsPerPage)
     const page = Number(query.page)
     const offset = (page - 1) * itemsPerPage

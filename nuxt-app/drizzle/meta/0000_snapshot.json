@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f4e9ed02-c05f-4d5b-858b-f8efdba14a53",
+  "id": "c43ebf17-49ed-463d-82dc-5f3ee5ca74df",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "adicionalItem": {
@@ -698,7 +698,21 @@
           "name": "userId",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "firstName": {
+          "name": "firstName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lastName": {
+          "name": "lastName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "checkIn": {

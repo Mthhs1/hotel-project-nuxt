@@ -3,68 +3,15 @@ import type { NavigationMenuItem } from "@nuxt/ui"
 
 const visible = ref(false)
 
-const items: NavigationMenuItem[][] = [
-    [
-        {
-            label: "Home",
-            icon: "i-lucide-house",
-            to: "/",
-        },
-        {
-            label: "Reserva",
-            defaultOpen: true,
-            icon: "i-lucide-inbox",
-            to: "/dashboard/reservation",
-            children: [
-                {
-                    label: "Ver minhas reservas",
-                    to: "/dashboard/reservation/my",
-                },
-                {
-                    label: "Fazer uma reserva",
-                    to: "/dashboard/reservation/list",
-                },
-            ],
-        },
-        {
-            label: "Meus Dados",
-            icon: "i-lucide-users",
-        },
-        {
-            label: "Settings",
-            icon: "i-lucide-settings",
-            defaultOpen: false,
-            children: [
-                {
-                    label: "General",
-                },
-                {
-                    label: "Members",
-                },
-                {
-                    label: "Notifications",
-                },
-                {
-                    label: "Notifications",
-                },
-            ],
-        },
-    ],
-    [
-        {
-            label: "Feedback",
-            icon: "i-lucide-message-circle",
-            to: "https://github.com/nuxt-ui-templates/dashboard",
-            target: "_blank",
-        },
-        {
-            label: "Help & Support",
-            icon: "i-lucide-info",
-            to: "https://github.com/nuxt/ui",
-            target: "_blank",
-        },
-    ],
-]
+let items: NavigationMenuItem[][]
+
+try {
+    const naviOptions = await useFetch("/api/me/dashboardNav")
+    items = naviOptions.data.value || []
+} catch (error) {
+    console.error("Error fetching dashboard navigation options:", error)
+}
+
 </script>
 
 <template>

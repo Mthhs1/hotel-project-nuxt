@@ -8,7 +8,6 @@ const authStore = useAuthStore()
 const { data } = await useAsyncData("auth-init", async () => {
     const response = await authStore.startSession()
 
-
     console.log(
     `A resposta para o start inicial foi ${response ? "verdadeiro" : "falso"}`,
 )

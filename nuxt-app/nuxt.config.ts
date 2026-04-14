@@ -4,11 +4,11 @@ import env from "./app/lib/env"
 export default defineNuxtConfig({
     compatibilityDate: "2025-07-15",
     devtools: {
-      enabled: true,
-
-      timeline: {
         enabled: true,
-      },
+
+        timeline: {
+            enabled: true,
+        },
     },
     modules: [
         "@nuxt/eslint",
@@ -19,6 +19,7 @@ export default defineNuxtConfig({
         "@pinia/nuxt",
         "@vueuse/nuxt",
         "@nuxtjs/color-mode",
+        "nuxt-anchorscroll",
     ],
     pinia: {
         /**
@@ -51,9 +52,9 @@ export default defineNuxtConfig({
         },
         scheduledTasks: {
             "*/15 * * * *": ["cleanPendingReservations"], // Run every 5 minutes
-        }
+        },
     },
-    
+
     devtools: {
         /*
         timeline: {
@@ -66,5 +67,12 @@ export default defineNuxtConfig({
         public: {
             BETTER_AUTH_URL: env.BETTER_AUTH_URL,
         },
+    },
+    anchorscroll: {
+        hooks: [
+            // Or any valid hook if needed
+            // Default is `page:finish`
+            "page:transition:finish",
+        ],
     },
 })

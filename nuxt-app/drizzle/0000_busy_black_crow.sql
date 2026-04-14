@@ -102,7 +102,9 @@ CREATE TABLE `quarto` (
 CREATE TABLE `reserva` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`quartoId` integer NOT NULL,
-	`userId` integer NOT NULL,
+	`userId` integer,
+	`firstName` text,
+	`lastName` text,
 	`checkIn` integer,
 	`checkOut` integer,
 	`createdAt` integer NOT NULL,

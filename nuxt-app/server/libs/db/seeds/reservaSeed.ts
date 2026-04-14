@@ -2,9 +2,13 @@ import {
     type AdicionalItem,
     adicionalItem,
 } from "../../../../app/lib/db/schemas/adicionalItem"
-import { type Quarto, quarto, reserva, type Reserva } from "../../../../app/lib/db/schemas/index"
+import {
+    type Quarto,
+    quarto,
+    reserva,
+    type Reserva,
+} from "../../../../app/lib/db/schemas/index"
 import db from "../../../../app/lib/db/index"
-
 
 function getRandomInt(min: number, max: number) {
     min = Math.ceil(min)
@@ -23,12 +27,15 @@ export async function seedReservas() {
         "id" | "createdAt" | "updateAt" | "userId"
     >[] = []
 
-    const users = await fetch("https://api.api-ninjas.com/v2/randomuser?count=30", {
-        method: "GET",
-        headers: {
-            "X-Api-Key": "uasNHiVSX1UKu2eodry4p18AY669YoBUF9iFkQnD",
+    const users = await fetch(
+        "https://api.api-ninjas.com/v2/randomuser?count=30",
+        {
+            method: "GET",
+            headers: {
+                "X-Api-Key": process.env.X_API_KEY_GENERATE_USERS!,
+            },
         },
-    }).then((res) => res.json())
+    ).then((res) => res.json())
 
     const quartos: Quarto[] = await db.select().from(quarto)
     const adicionais: AdicionalItem[] = await db.select().from(adicionalItem)

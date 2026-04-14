@@ -1,0 +1,26 @@
+<script setup lang="ts">
+import type { Quarto, Reserva } from "~/lib/db/schemas/index"
+import Item from "./item.vue"
+
+const props = defineProps<{
+    reservations: Array<{ reserva: Reserva; quarto: Quarto | null }> | undefined
+}>()
+</script>
+
+<template>
+    <div class="flex flex-col gap-4">
+        <div
+            v-for="reservation in props.reservations"
+            :key="reservation.reserva.id"
+            class="flex flex-row justify-center items-center gap-4"
+        >
+            <Item
+                :id="reservation.reserva.id"
+                :room-type="reservation.quarto?.roomType || ''"
+                :status="reservation.reserva.status"
+                :date-crated="reservation.reserva.createdAt"
+                class="flex-1"
+            />
+        </div>
+    </div>
+</template>

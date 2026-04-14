@@ -9,7 +9,7 @@ const rooms = ref<{ quarto: Quarto; adicionais: AdicionalItem[] }[]>()
 const totalNumberRooms = ref<number | undefined>()
 const page = ref(1)
 const selectedRoom = ref<number | null>()
-const itemsPerPage = ref(2)
+const itemsPerPage = ref(8)
 const buttonColor = ref("neutral")
 
 const response = await useAsyncData("get-first-rooms", async () => {

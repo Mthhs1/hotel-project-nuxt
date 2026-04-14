@@ -6,6 +6,7 @@ const EnvSchema = z.object({
     TURSO_AUTH_TOKEN: z.string(),
     BETTER_AUTH_SECRET: z.string(),
     BETTER_AUTH_URL: z.string(),
+    X_API_KEY_GENERATE_USERS: z.string(),
 })
 
 /*

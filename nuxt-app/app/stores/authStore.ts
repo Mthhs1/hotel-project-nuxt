@@ -1,19 +1,19 @@
 import { defineStore } from "pinia"
 import { sleep } from "~/utils/sleep"
 
+
 export const useAuthStore = defineStore("authStore", () => {
     const { $auth } = useNuxtApp()
 
+    // Declarando as interfaces para os tipos de usuário e sessão
     interface User {
         email: string
         password: string
     }
-
     interface NewUser extends User {
         name: string
         birthDay: number
     }
-
     type SessionType = typeof $auth.$Infer.Session
 
     let session = ref<SessionType | null>(null)
@@ -21,22 +21,21 @@ export const useAuthStore = defineStore("authStore", () => {
     async function startSession() {
         isLoadingHeaderIcons.value = true
 
-        const headers = import.meta.server
-            ? useRequestHeaders(["cookie"])
-            : undefined
-
-        // console.log("Headers: ", headers)
-
-        if (!headers?.cookie) {
-            // console.log("Headers nulos")
+        // declarando os headers e verificando se eles existem e possuem cookies
+        const headers = useRequestHeaders()
+        if (!headers || !headers.cookie) {
+            console.log("Headers nulos")
             isLoadingHeaderIcons.value = false
             return false
         }
 
+        // fazendo a requisição para obter a sessão do usuário
         const response = await $auth.getSession({
-            fetchOptions: { headers: headers },
+            fetchOptions: { headers },
         })
 
+        // verificando se a resposta da requisição possui um erro ou não
+        // e se não possuir, setando a sessão do usuário e retornando true, caso contrário, logando o erro e retornando false
         if (!response.error) {
             SET_Session(response.data)
             isLoadingHeaderIcons.value = false
