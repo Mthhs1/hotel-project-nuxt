@@ -1,34 +1,36 @@
 <script setup lang="ts">
 import type { SelectItem } from "@nuxt/ui"
 import List from "~/components/dashboard/employee/list.vue"
-import { type Quarto    , type Reserva } from "~/lib/db/schemas/index"
+import { type Quarto, type Reserva } from "~/lib/db/schemas/index"
 
 definePageMeta({
     middleware: ["role-check"],
 })
 
-
 const { scrollToAnchor, scrollToTop } = useAnchorScroll({
-  toTop: {
-    scrollOptions: {
-      behavior: 'smooth',
-      offsetTop: 0,
-    }
-  },
+    toTop: {
+        scrollOptions: {
+            behavior: "smooth",
+            offsetTop: 0,
+        },
+    },
 })
 
-const reservations = ref<{ reserva: Reserva; quarto: Quarto | null}[]>()
+const reservations = ref<{ reserva: Reserva; quarto: Quarto | null }[]>()
 const totalNumberRooms = ref<number | undefined>()
 
 const page = ref(1)
 const itemsPerPage = ref(8)
 
 const response = await useAsyncData("get-first-rooms-employee", async () => {
-    const { data, totalRoomsNumber } = await $fetch("/api/employee/all", {
-        headers: useRequestHeaders(),
-        method: "GET",
-        query: { itemsPerPage: itemsPerPage.value, page: page.value },
-    })
+    const { data, totalRoomsNumber } = await $fetch(
+        "/api/employee/all-reservations",
+        {
+            headers: useRequestHeaders(),
+            method: "GET",
+            query: { itemsPerPage: itemsPerPage.value, page: page.value },
+        },
+    )
 
     return { data, totalRoomsNumber }
 })
@@ -44,11 +46,28 @@ const itemsSelectOrder = ref<SelectItem[]>([
 
 async function handleChangePage(value: number) {
     page.value = value
-    
-    const { data, totalRoomsNumber } = await $fetch("/api/employee/all", {
-        method: "GET",
-        query: { itemsPerPage: itemsPerPage.value, page: value },
-    })
+
+    const { data, totalRoomsNumber } = await $fetch(
+        "/api/employee/all-reservations",
+        {
+            method: "GET",
+            query: { itemsPerPage: itemsPerPage.value, page: value },
+        },
+    )
+
+    reservations.value = data
+    totalNumberRooms.value = totalRoomsNumber
+    scrollToTop()
+}
+
+async function handleStatusChanged() {
+    const { data, totalRoomsNumber } = await $fetch(
+        "/api/employee/all-reservations",
+        {
+            method: "GET",
+            query: { itemsPerPage: itemsPerPage.value, page: page.value },
+        },
+    )
 
     reservations.value = data
     totalNumberRooms.value = totalRoomsNumber
@@ -91,6 +110,7 @@ async function handleChangePage(value: number) {
             <UContainer>
                 <List
                     :reservations="reservations"
+                    @status-changed="handleStatusChanged"
                 />
             </UContainer>
         </div>

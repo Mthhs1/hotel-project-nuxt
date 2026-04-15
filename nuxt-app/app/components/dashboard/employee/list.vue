@@ -5,6 +5,10 @@ import Item from "./item.vue"
 const props = defineProps<{
     reservations: Array<{ reserva: Reserva; quarto: Quarto | null }> | undefined
 }>()
+
+const emits = defineEmits<{
+    (event: "status-changed"): void
+}>()
 </script>
 
 <template>
@@ -20,6 +24,7 @@ const props = defineProps<{
                 :status="reservation.reserva.status"
                 :date-crated="reservation.reserva.createdAt"
                 class="flex-1"
+                @status-changed="emits('status-changed')"
             />
         </div>
     </div>

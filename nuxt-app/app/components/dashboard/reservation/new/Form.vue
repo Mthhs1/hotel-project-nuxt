@@ -1,158 +1,32 @@
 <script setup lang="ts">
-import type { CheckboxGroupItem } from "@nuxt/ui"
-import type { FormSubmitEvent } from "@nuxt/ui"
 import { type AdicionalItem, type Quarto } from "~/lib/db/schemas"
-import { FetchError } from "ofetch"
-import * as z from "zod"
 
-import { STAY_TIME_OPTIONS } from "~/../shared/const/stayTime"
-
-const toast = useToast()
+import {
+    reservationFormSchema,
+    type ReservationFormSchema,
+} from "~/utils/schemas/newReservationSchema"
+import { useReservationForm } from "~/composables/useReservationForm"
 
 const props = defineProps<{
     room: Quarto | undefined
     additionals: AdicionalItem[] | undefined
 }>()
 
-const schema = z
-    .object({
-        hours: z.string().min(1, "Selecione a duração da estadia."),
-        guests: z.number().min(1, "Selecione o número de hóspedes."),
-        booleanAdditionals: z.array(z.string()),
-        quantityAdditionals: z.record(
-            z.string(),
-            z.object({
-                isMarked: z.boolean(),
-                quantity: z.number(),
-            }),
-        ),
-    })
-    .superRefine((data, ctx) => {
-        // Validação personalizada para garantir que a quantidade seja maior que 0 quando um adicional de quantidade estiver marcado
-        for (const [additionalId, additionalData] of Object.entries(
-            data.quantityAdditionals,
-        )) {
-            if (additionalData.isMarked && additionalData.quantity <= 0) {
-                ctx.addIssue({
-                    code: "custom",
-                    message:
-                        "A quantidade deve ser maior que 0 para adicionais marcados.",
-                    path: ["quantityAdditionals", additionalId, "quantity"],
-                })
-            }
-        }
-    })
+const emits = defineEmits<{
+    (event: "extract-change", payload: ReservationFormSchema): void
+}>()
 
-type FormSchema = z.infer<typeof schema>
-
-const hourItems = ref<string[]>(STAY_TIME_OPTIONS)
-
-const optionalAdditionals = computed(() => {
-    return (props.additionals || []).filter(
-        (additional) => additional.isOptional,
-    )
+const {
+    state,
+    hourItems,
+    itemsCheckBoxGroupBoolean,
+    summaryBadges,
+    quantityAdditionals,
+    onSubmitFormHandler,
+} = useReservationForm({
+    room: toRef(props, "room"),
+    additionals: toRef(props, "additionals"),
 })
-
-const quantityAdditionals = computed(() => {
-    return (
-        props.additionals?.filter((additional) => {
-            if (additional.selectionType === "quantity") {
-                return true
-            }
-        }) || []
-    )
-})
-
-const quantityAdditionalsInitialState: Record<
-    string,
-    { isMarked: boolean; quantity: number }
-> = {}
-quantityAdditionals.value?.forEach((additional) => {
-    Object.assign(quantityAdditionalsInitialState, {
-        [String(additional.id)]: { isMarked: false, quantity: 0 },
-    })
-})
-
-const state = reactive<FormSchema>({
-    hours: "",
-    guests: 1,
-    booleanAdditionals: [],
-    quantityAdditionals: quantityAdditionalsInitialState,
-})
-
-const itemsCheckBoxGroupBoolean = computed<CheckboxGroupItem[]>(() =>
-    optionalAdditionals.value
-        .filter((additional) => {
-            if (additional.selectionType === "boolean") {
-                return true
-            }
-            quantityAdditionals
-        })
-        .map((additional) => {
-            return {
-                label: additional.name,
-                description: additional.description,
-                value: String(additional.id),
-            }
-        }),
-)
-
-watch(
-    () => state.quantityAdditionals,
-    (quantityAdditionals) => {
-        for (const additional of Object.values(quantityAdditionals)) {
-            if (!additional.isMarked && additional.quantity !== 0) {
-                additional.quantity = 0
-            }
-        }
-    },
-    { deep: true },
-)
-
-const summaryBadges = computed(() => [
-    {
-        label: "Tarifa base",
-        value:
-            props.room?.basePrice != null
-                ? `R$ ${props.room.basePrice.toFixed(2)}`
-                : "R$ --,--",
-    },
-    {
-        label: "Capacidade",
-        value: `${props.room?.baseCapacity ?? "--"} pessoas`,
-    },
-    {
-        label: "Extras",
-        value: `${optionalAdditionals.value.length} opcoes`,
-    },
-])
-
-/*
-function buildNormalizedAdditionals(
-    data: Partial<FormSchema>,
-): AdditionalInput[] {
-    const normalizedAdditionals: AdditionalInput[] = []
-
-    if (
-        garageAdditional.value &&
-        data.isGarageSelected &&
-        (data.numberGarage ?? 0) > 0
-    ) {
-        normalizedAdditionals.push({
-            adicionalItemId: garageAdditional.value.id,
-            quantity: data.numberGarage ?? 0,
-        })
-    }
-
-    ;(data.additionals || []).forEach((additionalId) => {
-        normalizedAdditionals.push({
-            adicionalItemId: Number(additionalId),
-            quantity: 1,
-        })
-    })
-
-    return normalizedAdditionals
-}*/
 
 watch(state, (newVal) => {
     emits("extract-change", {
@@ -163,54 +37,7 @@ watch(state, (newVal) => {
     })
 })
 
-async function onSubmitFormHandler(event: FormSubmitEvent<FormSchema>) {
-    const body = {
-        quartoId: props.room?.id,
-        person: event.data.guests,
-        stayTime: event.data.hours,
-        additionals: {
-            quantityAdditionals: event.data.quantityAdditionals,
-            booleanAdditionals: event.data.booleanAdditionals,
-        },
-    }
-
-    try {
-        const response = await $fetch("/api/reservation/new", {
-            method: "POST",
-            body,
-        })
-
-        if (response) {
-            toast.add({
-                title: "Reserva criada com sucesso!",
-                description:
-                    "Sua reserva foi criada e está pendente de confirmação.",
-                color: "success",
-                duration: 3000,
-            })
-
-            navigateTo("/dashboard/reservation/my")
-        }
-    } catch (error: FetchError | unknown) {
-        if (error instanceof FetchError) {
-            console.error("FetchError:", error.message, "Status:", error.status)
-            toast.add({
-                title: "Erro ao criar reserva!",
-                description:
-                    error.data?.message || "Ocorreu um erro inesperado.",
-                color: "error",
-                duration: 3000,
-            })
-            navigateTo("/dashboard/reservation/my")
-        } else {
-            console.error("Unexpected error:", error)
-        }
-    }
-}
-
-const emits = defineEmits<{
-    (event: "extract-change", payload: FormSchema): void
-}>()
+const toast = useToast()
 </script>
 
 <template>
@@ -262,7 +89,12 @@ const emits = defineEmits<{
         </template>
 
         <!-- Formulário -->
-        <UForm class="space-y-6" :state="state" :schema="schema" @submit="onSubmitFormHandler">
+        <UForm
+            class="space-y-6"
+            :state="state"
+            :schema="reservationFormSchema"
+            @submit="onSubmitFormHandler"
+        >
             <!-- Opções Principais -->
             <section
                 class="space-y-4 rounded-3xl bg-slate-50 p-5 ring-1 ring-slate-200/80"

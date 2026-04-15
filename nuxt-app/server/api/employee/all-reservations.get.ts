@@ -9,11 +9,6 @@ import {
 import { eq, asc, desc, count } from "drizzle-orm"
 import { auth } from "~/lib/auth"
 
-type quartoWithAdditionals = {
-    quarto: Quarto
-    adicionais: AdicionalItem[]
-}
-
 export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession({
         headers: event.headers,

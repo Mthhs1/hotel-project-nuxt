@@ -36,6 +36,34 @@ const mapStatusToText: MapStrToText = {
     Cancelled: "Cancelado",
     Completed: "Concluído",
 }
+
+async function handleChangeReservationStatus() {
+    try {
+        const response = await $fetch("/api/employee/change-status-reservation", {
+            method: "POST",
+            headers: useRequestHeaders(),
+            body: {
+                reservationId: props.id,
+                newStatus: "Confirmed",
+            },
+        })
+
+        console.log("Resposta da API (employee):", response)
+        emits("status-changed")
+
+    } catch (error) {
+        console.error("Error changing reservation status:", error)
+    }
+    
+}
+
+
+
+
+
+const emits = defineEmits<{
+    (event: "status-changed"): void
+}>()
 </script>
 
 <template>
@@ -47,8 +75,10 @@ const mapStatusToText: MapStrToText = {
                         <h4 class="font-bold">{{ props.roomType }}</h4>
                     </div>
                     <div class="flex gap-4">
-
-                        <UBadge variant="outline" class="w-20 flex justify-center">
+                        <UBadge
+                            variant="outline"
+                            class="w-20 flex justify-center"
+                        >
                             <NuxtTime :datetime="dateCrated" locale="pt-Br" />
                         </UBadge>
 
@@ -58,6 +88,12 @@ const mapStatusToText: MapStrToText = {
                             class="p-1 w-24 flex justify-center"
                             >Ver detalhes
                         </UButton>
+
+                        <UButton
+                            v-if="status === 'pending'"
+                            label="Confirmar Reserva"
+                            @click="handleChangeReservationStatus"
+                            />
 
                         <UBadge
                             class="w-20 flex justify-center"
