@@ -1,48 +1,85 @@
 import { ref, watch } from "vue"
-import { type AdicionalItem, type Quarto } from "~/lib/db/schemas/index"
-import { STAY_TIME_OPTIONS } from "../../shared/const/stayTime"
+import {
+    type AdicionalConsumido,
+    type AdicionalItem,
+    type Quarto,
+} from "~/lib/db/schemas/index"
+import {
+    STAY_TIME_OPTIONS,
+    STAY_TIME_TO_HOURS,
+} from "../../shared/const/stayTime"
 import { type ReservationFormSchema } from "~/utils/schemas/newReservationSchema"
-import type { CheckboxGroupItem, FormSubmitEvent } from "@nuxt/ui"
+import type { CheckboxGroupItem, FormSubmitEvent, SelectItem } from "@nuxt/ui"
 import { FetchError } from "ofetch"
 
-type props = Readonly<{
+// Declarando as props (argumentos) que serão recebidas pelo composable
+type props = {
     room: Ref<Quarto | undefined>
-    additionals: Ref<AdicionalItem[] | undefined>
-}>
+    additionals: Ref<Record<string, AdicionalItem>>
+    initialState: Ref<{
+        hours: number
+        guests: number
+        additionalsConsumed: AdicionalConsumido[]
+    } | null>
+}
 
 export function useReservationForm(props: props) {
     const toast = useToast()
 
-    const hourItems = ref<string[]>(STAY_TIME_OPTIONS)
+    // Criando os itens para o select de horas, mapeando as opções de tempo de estadia para o formato esperado pelo componente Select
+    // { label: string, value: number }
+    const hourItems = ref<SelectItem[]>(
+        STAY_TIME_OPTIONS.map((option) => ({
+            label: option,
+            value: STAY_TIME_TO_HOURS[option],
+        })),
+    )
 
+    // filtrando os adicionais de seleção (booleanos)
+    // {id: adicional}
     const booleanAdditionals = computed(() => {
-        return (props.additionals.value || []).filter(
-            (additional) => additional.isOptional,
+        const filtered = Object.entries(props.additionals.value).filter(
+            ([_, additional]) => {
+                return additional.selectionType === "boolean"
+            },
         )
+
+        return Object.fromEntries(filtered)
     })
 
+    // filtrando os adicionais de quantidade
+    // {id: adicional}
     const quantityAdditionals = computed(() => {
-        return (
-            props.additionals.value?.filter((additional) => {
-                if (additional.selectionType === "quantity") {
-                    return true
-                }
-            }) || []
+        const filtered = Object.entries(props.additionals.value).filter(
+            ([_, additional]) => {
+                return additional.selectionType === "quantity"
+            },
         )
+
+        return Object.fromEntries(filtered)
     })
 
+    // declarando o estado dos adicionais de quantidade
     const quantityAdditionalsInitialState: Record<
         string,
         { isMarked: boolean; quantity: number }
     > = {}
-    quantityAdditionals.value?.forEach((additional) => {
-        Object.assign(quantityAdditionalsInitialState, {
-            [String(additional.id)]: { isMarked: false, quantity: 0 },
-        })
+
+    // iterando sobre os adicionais existentes para forma o estado dos adicionais de quantidade
+    // {id: {isMarked, quantity}}
+    Object.entries(props.additionals.value).forEach(([id, additional]) => {
+        if (additional.selectionType === "quantity") {
+            quantityAdditionalsInitialState[id] = {
+                isMarked: false,
+                quantity: 0,
+            }
+        }
     })
 
+    // declarando o estado do formulario de reserva, que inclui as horas, hóspedes, 
+    // adicionais de seleção (booleanos) e adicionais de quantidade
     const state = reactive<ReservationFormSchema>({
-        hours: "",
+        hours: 0,
         guests: 1,
         booleanAdditionals: [],
         // Assumimos que os adicionais já chegam prontos e não mudam
@@ -50,22 +87,46 @@ export function useReservationForm(props: props) {
         quantityAdditionals: quantityAdditionalsInitialState,
     })
 
-    const itemsCheckBoxGroupBoolean = computed<CheckboxGroupItem[]>(() =>
-        booleanAdditionals.value
-            .filter((additional) => {
-                if (additional.selectionType === "boolean") {
-                    return true
-                }
-            })
-            .map((additional) => {
-                return {
-                    label: additional.name,
-                    description: additional.description,
-                    value: String(additional.id),
-                }
-            }),
-    )
+    // Se houver um estado inicial (reserva já existente), preenchemos o estado do 
+    // formulário com os dados da reserva, mapeando os adicionais consumidos para os formatos esperados pelos campos booleanAdditionals e quantityAdditionals
+    if (props.initialState.value) {
+        props.initialState.value.additionalsConsumed.forEach((consumed) => {
+            const additional = props.additionals.value[consumed.adicionalItemId]
 
+            if (additional?.selectionType === "boolean") {
+                state.booleanAdditionals.push(String(additional.id))
+            }
+
+            if (additional?.selectionType === "quantity") {
+                state.quantityAdditionals[String(additional.id)] = {
+                    isMarked: consumed.quantity > 0,
+                    quantity: consumed.quantity,
+                }
+            }
+        })
+
+        state.hours = props.initialState.value.hours
+        state.guests = props.initialState.value.guests
+    }
+
+    // Criando os itens para o checkbox group dos adicionais de seleção (booleanos), 
+    // mapeando os adicionais filtrados para o formato esperado pelo componente CheckboxGroup
+    // { label: string, description: string, value: string }
+    const itemsCheckBoxGroupBoolean = computed<CheckboxGroupItem[]>(() => {
+        return Object.entries(booleanAdditionals.value)
+            .filter(([_, additional]) => {
+                return additional.isOptional
+            })
+            .map(([id, additional]) => ({
+                label: additional.name,
+                description: additional.description,
+                value: id,
+            }))
+    })
+
+    //watcher o qual é responsavel de observar as mudanças no estado dos adicionais de quantidade, 
+    // e caso um adicional seja desmarcado (isMarked: false) ele zera a quantidade desse adicional para 0, 
+    // garantindo que não haja inconsistências entre o estado de marcação e a quantidade dos adicionais de quantidade
     watch(
         () => state.quantityAdditionals,
         (quantityAdditionals) => {
@@ -78,6 +139,9 @@ export function useReservationForm(props: props) {
         { deep: true },
     )
 
+    // Criando os badges de resumo da reserva, que exibem informações como tarifa base, capacidade e quantidade de adicionais selecionados,
+    // mapeando os dados do quarto e dos adicionais para o formato esperado pelos badges
+    // { label: string, value: string }
     const summaryBadges = computed(() => [
         {
             label: "Tarifa base",
@@ -96,6 +160,9 @@ export function useReservationForm(props: props) {
         },
     ])
 
+    //handler que irá lidar com a submissão do formulário de reserva, 
+    // enviando os dados para a API e tratando as respostas de sucesso e erro, exibindo mensagens de toast e 
+    // redirecionando o usuário conforme necessário
     async function onSubmitFormHandler(
         event: FormSubmitEvent<ReservationFormSchema>,
     ) {

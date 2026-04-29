@@ -9,10 +9,10 @@ import { useReservationSummary } from "~/composables/useReservationSummary"
 import type { Quarto, AdicionalConsumido } from "~/lib/db/schemas/index"
 
 const route = useRoute()
-const roomId = Number(route.query.id)
+const reservationId = Number(route.params.id)
 
-const fetchRoomByRoomId = async (
-    identifier: number,
+const fetchRoomByReservationId = async (
+    id: number,
 ): Promise<
     | {
           room: Quarto | undefined
@@ -25,19 +25,23 @@ const fetchRoomByRoomId = async (
     | undefined
 > => {
     try {
-        const response = await $fetch("/api/rooms/some", {
-            headers: useRequestHeaders(["cookie"]),
+        const response = await $fetch("/api/employee/some-rooms", {
             method: "GET",
             query: {
-                by: "id",
-                identifier,
+                reservationId: id,
+                limit: 1,
             },
+            headers: useRequestHeaders(["cookie"]),
         })
 
-        const initialState = null
+        const initialState = {
+            hours: response.hours ?? 0,
+            guests: response.guests ?? 1,
+            additionalsConsumed: response.additionals ?? [],
+        }
 
         return {
-            room: response,
+            room: response.room,
             initialState,
         }
     } catch (error) {
@@ -55,8 +59,8 @@ const {
     handleExtractChange,
 } = await useReservationSummary(
     "get-selected-room-new-reservation",
-    roomId,
-    fetchRoomByRoomId,
+    reservationId,
+    fetchRoomByReservationId,
 )
 </script>
 
@@ -74,9 +78,9 @@ const {
                     <!-- Formulário de criação da reserva -->
                     <Form
                         :additionals="additionalsDB"
-                        :initial-state="initialState"
+                        :initial-state="initialState!"
                         :room="room"
-                        mode="user"
+                        mode="employee"
                         @extract-change="handleExtractChange"
                     />
 

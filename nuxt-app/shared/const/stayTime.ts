@@ -1,4 +1,4 @@
-import type { StayTimeOption, MapHoursToInt} from "../types/stayTime"
+import type { StayTimeOption, MapHoursToInt, MapIntToHours} from "../types/stayTime"
 
 export const STAY_TIME_OPTIONS: StayTimeOption[] = [
   "2 horas",
@@ -8,10 +8,26 @@ export const STAY_TIME_OPTIONS: StayTimeOption[] = [
   "Per noite",
 ]
 
-export const DEFAULT_STAY_TIME_MULTIPLIER: MapHoursToInt = {
-  "2 horas": 1,
-  "4 horas": 2,
-  "6 horas": 3,
-  "8 horas": 4,
-  "Per noite": 6,
+export const HOURS_TO_STAY_TIME: MapIntToHours = {
+  2: "2 horas",
+  4: "4 horas",
+  6: "6 horas",
+  8: "8 horas",
+  12: "Per noite",
+}
+
+export const STAY_TIME_TO_HOURS: MapHoursToInt = {
+  "2 horas": 2,
+  "4 horas": 4,
+  "6 horas": 6,
+  "8 horas": 8,
+  "Per noite": 12,
+}
+
+export const DEFAULT_STAY_TIME_MULTIPLIER: Record<number, number> = {
+  2: 1,
+  4: 2,
+  6: 3,
+  8: 4,
+  12: 6,
 }

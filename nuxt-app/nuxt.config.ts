@@ -60,7 +60,8 @@ export default defineNuxtConfig({
         timeline: {
             enabled: false,
         },*/
-        enabled: false, // or false to disable
+        enabled: true, // or false to disable
+        
     },
     runtimeConfig: {
         // Public keys that are exposed to the client

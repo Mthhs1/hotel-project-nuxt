@@ -1,10 +1,8 @@
 <script lang="ts" setup>
-import { map } from "zod"
-import { vi } from "zod/v4/locales"
 import { type Quarto, type AdicionalItem } from "~/lib/db/schemas"
 
 const props = defineProps<{
-    mapAdditionals: Record<string, AdicionalItem>
+    additionals: Record<string, AdicionalItem>
     prices: {
         guestsPrice: number
         hoursPrice: number
@@ -17,33 +15,9 @@ const props = defineProps<{
         totalPrice: number
     }
     guests: number
-    hours: string
+    hours: number
     room: Quarto
 }>()
-
-// Adicionais filtrados para exibir apenas os que não são de garagem,
-// mapeando os dados para incluir o nome do adicional e o total calculado com base na quantidade selecionada,
-// facilitando a exibição dos adicionais no extrato da reserva sem incluir a garagem, que é tratada separadamente
-/*
-const visibleAdditionals = computed(() => {
-    return props.additionals
-        .filter((additional) => {
-            return (
-                props.additionalsPrice[additional.adicionalItemId]?.name !==
-                "Garagem"
-            )
-        })
-        .map((additional) => {
-            const additionalData =
-                props.additionalsPrice[additional.adicionalItemId]
-
-            return {
-                ...additional,
-                name: additionalData?.name || "Adicional",
-                total: (additionalData?.basePrice ?? 0) * additional.quantity,
-            }
-        })
-})*/
 
 const visibleQuantityAdditionals = computed(() => {
     const visible: { name: string; quantity: number; total: number }[] = []
@@ -52,11 +26,11 @@ const visibleQuantityAdditionals = computed(() => {
         props.prices.quantityAdditionalsPrice,
     )) {
         if (
-            props.mapAdditionals[id]?.selectionType === "quantity" &&
+            props.additionals[id]?.selectionType === "quantity" &&
             price > 0
         ) {
             visible.push({
-                name: props.mapAdditionals[id]?.name || "Adicional",
+                name: props.additionals[id]?.name || "Adicional",
                 quantity,
                 total: price,
             })
@@ -73,13 +47,13 @@ const visibleBooleanAdditionals = computed(() => {
         props.prices.booleanAdditionalsPrice,
     )) {
         if (
-            props.mapAdditionals[id]?.selectionType === "boolean" &&
+            props.additionals[id]?.selectionType === "boolean" &&
             price > 0
         ) {
             visible.push({
-                name: props.mapAdditionals[id]?.name || "Adicional",
+                name: props.additionals[id]?.name || "Adicional",
                 price,
-                description: props.mapAdditionals[id]?.description || "",
+                description: props.additionals[id]?.description || "",
             })
         }
     }
@@ -93,65 +67,18 @@ const guestsExceedBaseCapacity = computed(() => {
     return Math.max(props.guests - (props.room?.baseCapacity || 0), 0)
 })
 
-/*
-// Cards ativos baseados nas props, criando uma lista de itens a serem exibidos no extrato da reserva,
-const activeSummaryItems = computed(() => {
-    const items = []
-
-    // Horas selecionadas
-    if (props.hours) {
-        items.push({
-            label: "Tempo de estadia",
-            detail: props.hours,
-            value: props.hoursPrice || 0,
-        })
-    }
-
-    // Hóspedes extras que excedem a capacidade base do quarto
-    if (guestsExceedBaseCapacity.value > 0) {
-        items.push({
-            label: "Pessoas extras",
-            detail: `${guestsExceedBaseCapacity.value} adicional(is)`,
-            value: props.totalGuestsExtra,
-        })
-    }
-
-    // Adicional de garagem
-    if (props.isGarageSelected && props.numberGarage > 0) {
-        items.push({
-            label: "Garagem",
-            detail: `${props.numberGarage} vaga(s)`,
-            value: props.totalGarage,
-        })
-    }
-
-    // Outros adicionais selecionados, excluindo a garagem, que é tratada separadamente
-    visibleAdditionals.value.forEach((additional) => {
-        items.push({
-            label: additional.name,
-            detail:
-                additional.quantity > 1
-                    ? `${additional.quantity} unidades`
-                    : "Selecionado",
-            value: additional.total,
-        })
-    })
-
-    return items
-})
-*/
-
 const emptyState = computed(
     () =>
         visibleBooleanAdditionals.value.length === 0 &&
         visibleQuantityAdditionals.value.length === 0 &&
-        props.hours === "" &&
+        props.hours === 0 &&
         guestsExceedBaseCapacity.value === 0,
 )
 
 function formatCurrency(value: number) {
     return `R$ ${value.toFixed(2)}`
 }
+
 </script>
 
 <template>
@@ -214,7 +141,7 @@ function formatCurrency(value: number) {
                         Duração
                     </p>
                     <p class="mt-2 text-xl font-semibold text-slate-900">
-                        {{ hours || "--" }}
+                        {{ hours || 0 }} horas
                     </p>
                 </div>
                 <div class="rounded-2xl bg-white p-4 ring-1 ring-slate-200">

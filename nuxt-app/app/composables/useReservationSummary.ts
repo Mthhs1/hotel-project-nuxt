@@ -1,54 +1,63 @@
 import { type ReservationFormSchemaBase } from "~/utils/schemas/newReservationSchema"
-import type { Quarto, AdicionalItem } from "~/lib/db/schemas/index"
+import type {
+    Quarto,
+    AdicionalItem,
+    AdicionalConsumido,
+} from "~/lib/db/schemas/index"
 
 import extractCalculate from "~~/shared/helpers/extractCalculate"
 
-export async function useReservationSummary(asyncKey: string) {
-    const route = useRoute()
-
+export async function useReservationSummary(
+    asyncKey: string,
+    identifier: number,
+    fetchRoom: (identifier: number) => Promise<
+        | {
+              room: Quarto | undefined
+              initialState: {
+                  hours: number
+                  guests: number
+                  additionalsConsumed: AdicionalConsumido[]
+              } | null
+          }
+        | undefined
+    >,
+) {
     // Estado reativo para os dados do formulário com os valores iniciais
     const formInfoRetrieved = reactive<ReservationFormSchemaBase>({
-        hours: "",
+        hours: 0,
         guests: 0,
         booleanAdditionals: [],
         quantityAdditionals: {},
     })
 
-    // Declaração das variáveis reativas para os dados da reserva/quarto e adicionais
-    const room = ref<Quarto | undefined>(undefined)
-    const additionalsDB = ref<AdicionalItem[] | undefined>(undefined)
-
     // fetch dos dados do quarto selecionado e dos adicionais disponíveis para reserva feito no SSR para garantir que os dados estejam disponíveis ao carregar a página, evitando problemas de renderização ou falta de dados nos componentes filhos
     const response = await useAsyncData(asyncKey, async () => {
-        const query = route.query
-        if (!Object.keys(query).length) {
+        if (!identifier) {
             navigateTo("/")
         }
 
-        const responseRooms = await $fetch("/api/rooms/some", {
-            method: "GET",
-            query: {
-                by: "id",
-                identifier: Number(query.id),
-            },
-        })
+        const response = await fetchRoom(identifier)
 
         const responseAdditionals = await $fetch("/api/additionals/all", {
             method: "GET",
         })
 
-        return { room: responseRooms, additionals: responseAdditionals }
+        return {
+            room: response?.room,
+            additionals: responseAdditionals,
+            initialState: response?.initialState,
+        }
     })
 
     // Atribuição dos dados obtidos do fetch às variáveis reativas para uso nos componentes filhos e na lógica de cálculo dos valores da reserva
-    room.value = response.data.value?.room
-    additionalsDB.value = response.data.value?.additionals
+    const room = computed(() => response.data.value?.room)
+    const additionalsDB = computed(() => {
+        const map: Record<string, AdicionalItem> = {}
 
-    // Mapeamento dos adicionais para um formato mais acessível, facilitando a consulta dos preços e detalhes dos adicionais durante o processo de reserva
-    // Está na forma {adicionalItemId: AdicionalItem}, permitindo acessar diretamente os detalhes de um adicional pelo seu ID
-    const mapAdditionals = reactive<Record<string, AdicionalItem>>({})
-    additionalsDB.value?.forEach((additional) => {
-        mapAdditionals[String(additional.id)] = additional
+        response.data.value?.additionals?.forEach((additional) => {
+            map[String(additional.id)] = additional
+        })
+        return map
     })
 
     const prices = reactive({
@@ -74,7 +83,7 @@ export async function useReservationSummary(asyncKey: string) {
             totalPrice,
             booleanAdditionalsPrice,
             quantityAdditionalsPrice,
-        } = extractCalculate(room.value!, mapAdditionals, formInfoRetrieved)
+        } = extractCalculate(room.value!, additionalsDB.value, formInfoRetrieved)
 
         Object.assign(prices, {
             guestsPrice,
@@ -89,9 +98,9 @@ export async function useReservationSummary(asyncKey: string) {
     return {
         room,
         additionalsDB,
-        handleExtractChange,
-        mapAdditionals,
         prices,
         formInfoRetrieved,
+        initialState: response.data.value?.initialState || null,
+        handleExtractChange,
     }
 }

@@ -1,8 +1,5 @@
 import db from "~/lib/db"
 import {
-    adicionalItem,
-    type AdicionalItem,
-    type Quarto,
     quarto,
     reserva,
 } from "~/lib/db/schemas/index"
@@ -59,7 +56,7 @@ export default defineEventHandler(async (event) => {
                 .limit(itemsPerPage)
                 .offset(offset)
 
-            const responseDBCount = await await db
+            const responseDBCount = await db
                 .select({ count: count() })
                 .from(reserva)
 

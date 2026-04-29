@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type AdicionalItem, type Quarto } from "~/lib/db/schemas"
+import { type AdicionalItem, type Quarto, type AdicionalConsumido } from "~/lib/db/schemas"
 
 import {
     reservationFormSchema,
@@ -9,7 +9,13 @@ import { useReservationForm } from "~/composables/useReservationForm"
 
 const props = defineProps<{
     room: Quarto | undefined
-    additionals: AdicionalItem[] | undefined
+    additionals: Record<string, AdicionalItem>
+    mode: string
+    initialState: {
+        hours: number
+        guests: number
+        additionalsConsumed: AdicionalConsumido[]
+    } | null
 }>()
 
 const emits = defineEmits<{
@@ -26,6 +32,7 @@ const {
 } = useReservationForm({
     room: toRef(props, "room"),
     additionals: toRef(props, "additionals"),
+    initialState: toRef(props, "initialState"),
 })
 
 watch(state, (newVal) => {
@@ -35,6 +42,9 @@ watch(state, (newVal) => {
         booleanAdditionals: newVal.booleanAdditionals ?? [],
         quantityAdditionals: newVal.quantityAdditionals ?? {},
     })
+},{
+    deep: true,
+    immediate: true,
 })
 
 const toast = useToast()
@@ -55,12 +65,20 @@ const toast = useToast()
                     <p
                         class="text-xs font-semibold uppercase tracking-[0.26em] text-slate-500"
                     >
-                        Personalizacao da reserva
+                        {{
+                            mode === "employee"
+                                ? "Confirmação da reserva"
+                                : "Personalização da reserva"
+                        }}
                     </p>
                     <h2
                         class="text-2xl font-semibold tracking-tight text-slate-950"
                     >
-                        Monte sua estadia
+                        {{
+                            mode === "employee"
+                                ? "Confirme a reserva utilizada pelo cliente durante a estadia"
+                                : "Monte sua estadia"
+                        }}
                     </h2>
                     <p class="text-sm leading-6 text-slate-600">
                         Defina a duracao, ajuste a quantidade de hospedes e
@@ -157,20 +175,21 @@ const toast = useToast()
 
                 <div class="flex flex-col">
                     <div
-                        v-if="quantityAdditionals?.length > 0"
-                        v-for="additional in quantityAdditionals"
-                        :key="additional.id"
+                        v-if="Object.keys(quantityAdditionals).length != 0"
+                        v-for="(value, key) in quantityAdditionals"
+                        :key="key"
                         class="rounded-2xl bg-white/80 p-4 ring-1 ring-amber-200/80 flex flex-col gap-4 md:flex-row"
                     >
+                        
                         <UFormField
-                            :label="`Deseja ${additional.name}?`"
+                            :label="`Deseja ${value.name}?`"
                             orientation="horizontal"
-                            :name="`quantityAdditionals.${additional.id}.isMarked`"
+                            :name="`quantityAdditionals.${key}.isMarked`"
                             class="flex items-center justify-start gap-4 my-4 flex-1"
                         >
                             <UCheckbox
                                 v-model="
-                                    state.quantityAdditionals[additional.id]!
+                                    state.quantityAdditionals[value.id]!
                                         .isMarked
                                 "
                             />
@@ -179,12 +198,12 @@ const toast = useToast()
                         <UFormField
                             label="Quantas?"
                             class="rounded-2xl bg-white/80 ring-amber-200/80 my-4 flex-2"
-                            :name="`quantityAdditionals.${additional.id}.quantity`"
+                            :name="`quantityAdditionals.${key}.quantity`"
                             :ui="{ error: 'text-[12px]' }"
                         >
                             <UInputNumber
                                 v-model="
-                                    state.quantityAdditionals[additional.id]!
+                                    state.quantityAdditionals[value.id]!
                                         .quantity
                                 "
                                 :increment="false"
@@ -194,7 +213,7 @@ const toast = useToast()
                                 variant="soft"
                                 class="w-full"
                                 :disabled="
-                                    !state.quantityAdditionals[additional.id]
+                                    !state.quantityAdditionals[value.id]
                                         ?.isMarked
                                 "
                             />

@@ -1,7 +1,7 @@
 import * as zod from "zod"
 
 export const reservationFormSchemaBase = zod.object({
-    hours: zod.string().min(1, "Selecione a duração da estadia."),
+    hours: zod.number().min(1, "Selecione a duração da estadia."),
     guests: zod.number().min(1, "Selecione o número de hóspedes."),
     booleanAdditionals: zod.array(zod.string()),
     quantityAdditionals: zod.record(

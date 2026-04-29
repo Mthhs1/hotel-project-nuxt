@@ -39,27 +39,24 @@ const mapStatusToText: MapStrToText = {
 
 async function handleChangeReservationStatus() {
     try {
-        const response = await $fetch("/api/employee/change-status-reservation", {
-            method: "POST",
-            headers: useRequestHeaders(),
-            body: {
-                reservationId: props.id,
-                newStatus: "Confirmed",
+        const response = await $fetch(
+            "/api/employee/change-status-reservation",
+            {
+                method: "POST",
+                headers: useRequestHeaders(),
+                body: {
+                    reservationId: props.id,
+                    newStatus: "Confirmed",
+                },
             },
-        })
+        )
 
         console.log("Resposta da API (employee):", response)
         emits("status-changed")
-
     } catch (error) {
         console.error("Error changing reservation status:", error)
     }
-    
 }
-
-
-
-
 
 const emits = defineEmits<{
     (event: "status-changed"): void
@@ -90,10 +87,18 @@ const emits = defineEmits<{
                         </UButton>
 
                         <UButton
+                            v-if="status === 'Confirmed'"
+                            variant="soft"
+                            color="neutral"
+                            :to="`/dashboard/employee/checkout/${props.id}`"
+                            label="Fazer Checkout"
+                        />
+
+                        <UButton
                             v-if="status === 'pending'"
                             label="Confirmar Reserva"
                             @click="handleChangeReservationStatus"
-                            />
+                        />
 
                         <UBadge
                             class="w-20 flex justify-center"

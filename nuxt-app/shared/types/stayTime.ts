@@ -6,3 +6,5 @@ export type StayTimeOption =
   | "Per noite"
 
 export type MapHoursToInt = Record<StayTimeOption, number>
+
+export type MapIntToHours = Record<number, StayTimeOption>

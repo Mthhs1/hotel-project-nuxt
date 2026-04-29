@@ -2,7 +2,6 @@
 import { type Quarto, type Reserva } from "~/lib/db/schemas"
 import { callWithNuxt } from "#app"
 import TopBadgeMyReservations from "~/components/dashboard/reservation/my/topBadgeMyReservations.vue"
-import MainBadgeMyReservations from "~/components/dashboard/reservation/my/mainBadgeMyReservations.vue"
 import MainMyReservations from "~/components/dashboard/reservation/my/mainMyReservations.vue"
 
 const response = await useAsyncData("get-my-reservation", async () => {

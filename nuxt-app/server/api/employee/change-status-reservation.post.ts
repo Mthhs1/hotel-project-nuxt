@@ -1,12 +1,8 @@
 import db from "~/lib/db"
 import {
-    adicionalItem,
-    type AdicionalItem,
-    type Quarto,
-    quarto,
     reserva,
 } from "~/lib/db/schemas/index"
-import { eq, asc, desc, count } from "drizzle-orm"
+import { eq, } from "drizzle-orm"
 import { auth } from "~/lib/auth"
 
 export default defineEventHandler(async (event) => {

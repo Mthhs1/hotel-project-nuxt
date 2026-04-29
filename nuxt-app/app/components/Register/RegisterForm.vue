@@ -159,12 +159,14 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     :ui="{ error: 'text-[.7rem]' }"
                     size="xs"
                     label="Data de Nascimento"
-                    name="birthday"
+                    name="birthDay"
                 >
                     <UInputDate
                         v-model="state.birthDay"
                         class="w-full"
                         variant="soft"
+                        locale="pt-BR"
+
                     />
                 </UFormField>
             </UContainer>

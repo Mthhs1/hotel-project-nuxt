@@ -2,19 +2,18 @@
 import { auth } from "../../../app/lib/auth"
 import db from "../../../app/lib/db/index"
 import {
-    reserva,
     type Reserva,
     type AdicionalConsumido,
+    type Quarto,
+    type AdicionalItem,
+    reserva,
     adicionalItem,
     adicionalConsumido,
+    quarto,
 } from "../../../app/lib/db/schemas/index"
 import { eq, and, inArray } from "drizzle-orm"
 import { DEFAULT_STAY_TIME_MULTIPLIER } from "~/../shared/const/stayTime"
-import { type StayTimeOption } from "~/../shared/types/stayTime"
-
-interface MapHoursToPrice {
-    [key: string]: number
-}
+import extractCalculate from "../../../shared/helpers/extractCalculate"
 
 export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession({
@@ -39,8 +38,8 @@ export default defineEventHandler(async (event) => {
             const body = await readBody<{
                 quartoId: number
                 person: number
-                stayTime: string
-                additionals?: {
+                stayTime: number
+                additionals: {
                     quantityAdditionals: Record<
                         string,
                         { isMarked: boolean; quantity: number }
@@ -51,18 +50,54 @@ export default defineEventHandler(async (event) => {
 
             // criando a variavel para amarzenar o resultado da criação da reserva
             let reservaResult: Reserva[]
+            let room: Quarto | null
+
+            // buscando os detalhes do quarto para calcular o preço total da reserva
+            try {
+                const roomResponse = await db
+                    .select()
+                    .from(quarto)
+                    .where(eq(quarto.id, body.quartoId))
+                room = roomResponse[0] || null
+            } catch (error) {
+                console.error("Error fetching room details:", error)
+                throw new Error("Failed to fetch room details")
+            }
+
+            // buscando os detalhes dos adicionais
+            let additionalsResponse: AdicionalItem[]
+            try {
+                additionalsResponse = await db.select().from(adicionalItem)
+            } catch (error) {
+                console.error("Error fetching additionals:", error)
+                throw new Error("Failed to fetch additionals")
+            }
+
+            // mapeando os adicionais para um formato de fácil acesso por id
+            const additionalsDB: Record<string, AdicionalItem> = {}
+            additionalsResponse.forEach((additional) => {
+                additionalsDB[String(additional.id)] = additional
+            })
+
+            // usando uma função auxiliar para calcular os preços dos adicionais
+            const { booleanAdditionalsPrice, quantityAdditionalsPrice } =
+                extractCalculate(room!, additionalsDB, {
+                    hours: body.stayTime,
+                    guests: body.person,
+                    booleanAdditionals: body.additionals.booleanAdditionals,
+                    quantityAdditionals: body.additionals.quantityAdditionals,
+                })
 
             // criando o objeto de dados para a nova reserva
             const reservaData: Omit<Reserva, "id" | "createdAt" | "updateAt"> =
                 {
                     quartoId: body.quartoId,
                     userId: userId,
+                    firstName: null,
+                    lastName: null,
                     checkIn: null,
                     checkOut: null,
-                    stayTime:
-                        DEFAULT_STAY_TIME_MULTIPLIER[
-                            body.stayTime as StayTimeOption
-                        ],
+                    stayTime: body.stayTime,
                     person: body.person,
                     status: "pending",
                 }
@@ -78,64 +113,47 @@ export default defineEventHandler(async (event) => {
                 throw new Error("Failed to create reservation")
             }
 
+            // declarando um array para armazenar os adicionais consumidos relacionados à reserva criada
             const additionalsUnion: Omit<AdicionalConsumido, "id">[] = []
 
-            // buscando os detalhes dos adicionais
-            const additionalItemsDB = await db.select().from(adicionalItem)
-            const mapAdditionals = new Map(
-                additionalItemsDB.map((item) => [String(item.id), item]),
-            )
-
-            // juntando os dois adicionais e formando o objeto para inserção em adicionalConsumido
-            if (
-                (body.additionals?.booleanAdditionals &&
-                    body.additionals.booleanAdditionals.length > 0) ||
-                (body.additionals?.quantityAdditionals &&
-                    Object.keys(body.additionals.quantityAdditionals).length >
-                        0)
-            ) {
-                // processando os booleanos
-                if (
-                    body.additionals?.booleanAdditionals &&
-                    body.additionals.booleanAdditionals.length > 0
-                ) {
-                    for (const id of body.additionals.booleanAdditionals) {
-                        if (mapAdditionals.has(id)) {
-                            const item = mapAdditionals.get(id)
-                            additionalsUnion.push({
-                                adicionalItemId: Number(id),
-                                reservaId: reservaResult[0]!.id,
-                                quantity: 1,
-                                priceAtTime: item!.basePrice,
-                            })
-                        }
-                    }
+            // inserindo os adicionais de seleção (booleanos) selecionados, caso existam,
+            // no array de adicionais consumidos relacionados à reserva criada
+            if (booleanAdditionalsPrice) {
+                for (const [id, price] of Object.entries(
+                    booleanAdditionalsPrice,
+                )) {
+                    additionalsUnion.push({
+                        adicionalItemId: Number(id),
+                        reservaId: reservaResult[0]!.id,
+                        quantity: 1,
+                        priceAtTime: price,
+                    })
                 }
+            }
 
-                // processando os quantitativos
-                if (
-                    body.additionals?.quantityAdditionals &&
-                    Object.keys(body.additionals.quantityAdditionals).length > 0
-                ) {
-                    for (const [id, { isMarked, quantity }] of Object.entries(
-                        body.additionals.quantityAdditionals,
-                    )) {
-                        if (isMarked && mapAdditionals.has(id)) {
-                            const item = mapAdditionals.get(id)
-                            additionalsUnion.push({
-                                adicionalItemId: Number(id),
-                                reservaId: reservaResult[0]!.id,
-                                quantity: quantity,
-                                priceAtTime: item!.basePrice,
-                            })
-                        }
-                    }
+            // inserindo os adicionais de quantidade selecionados, caso existam, 
+            // no array de adicionais consumidos relacionados à reserva criada
+            if (quantityAdditionalsPrice) {
+                for (const [id, { price, quantity }] of Object.entries(
+                    quantityAdditionalsPrice,
+                )) {
+                    additionalsUnion.push({
+                        adicionalItemId: Number(id),
+                        reservaId: reservaResult[0]!.id,
+                        quantity: quantity,
+                        priceAtTime: price,
+                    })
                 }
             }
 
             // inserindo os adicionais consumidos relacionados à reserva criada, caso existam
             if (additionalsUnion.length > 0) {
-                await db.insert(adicionalConsumido).values(additionalsUnion)
+                try {
+                    await db.insert(adicionalConsumido).values(additionalsUnion)
+                } catch (error) {
+                    console.error("Error inserting consumed additionals:", error)
+                    throw new Error("Failed to insert consumed additionals")
+                }
             }
 
             setResponseStatus(event, 201)
