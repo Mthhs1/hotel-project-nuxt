@@ -1,41 +1,16 @@
 <script setup lang="ts">
+import {
+    RESERVATION_STATUS_BADGE_COLOR,
+    RESERVATION_STATUS_LABEL,
+    type ReservationStatus,
+} from "~/../shared/const/reservationStatus"
+
 const props = defineProps<{
     roomType: string
-    status: string
+    status: ReservationStatus
     id: number
     dateCrated: number
 }>()
-
-type BadgeColor =
-    | "success"
-    | "warning"
-    | "error"
-    | "primary"
-    | "secondary"
-    | "info"
-    | "neutral"
-
-interface MapStrToColor {
-    [key: string]: BadgeColor
-}
-
-interface MapStrToText {
-    [key: string]: string
-}
-
-const mapStatusToColor = reactive<MapStrToColor>({
-    Completed: "success",
-    Confirmed: "info",
-    pending: "warning",
-    Cancelled: "error",
-})
-
-const mapStatusToText: MapStrToText = {
-    Confirmed: "Confirmado",
-    pending: "Pendente",
-    Cancelled: "Cancelado",
-    Completed: "Concluído",
-}
 
 async function handleChangeReservationStatus() {
     try {
@@ -46,7 +21,7 @@ async function handleChangeReservationStatus() {
                 headers: useRequestHeaders(),
                 body: {
                     reservationId: props.id,
-                    newStatus: "Confirmed",
+                    newStatus: "confirmed",
                 },
             },
         )
@@ -87,7 +62,7 @@ const emits = defineEmits<{
                         </UButton>
 
                         <UButton
-                            v-if="status === 'Confirmed'"
+                            v-if="status === 'confirmed'"
                             variant="soft"
                             color="neutral"
                             :to="`/dashboard/employee/checkout/${props.id}`"
@@ -101,9 +76,9 @@ const emits = defineEmits<{
                         />
 
                         <UBadge
-                            class="w-20 flex justify-center"
-                            :color="mapStatusToColor[props.status]"
-                            >{{ mapStatusToText[props.status] }}</UBadge
+                            class="w-20 flex justify-center h-8"
+                            :color="RESERVATION_STATUS_BADGE_COLOR[props.status]"
+                            >{{ RESERVATION_STATUS_LABEL[props.status] }}</UBadge
                         >
                     </div>
                 </div>

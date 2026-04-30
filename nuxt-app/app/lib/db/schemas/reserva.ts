@@ -1,4 +1,7 @@
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core"
+import { RESERVATION_STATUS } from "../../../../shared/const/reservationStatus"
+
+const PENDING_STATUS = RESERVATION_STATUS[0]
 
 import { user } from "./auth-schema"
 import { quarto } from "./quarto"
@@ -23,8 +26,7 @@ export const reserva = sqliteTable("reserva", {
         .$onUpdate(() => Date.now()),
     stayTime: int().notNull(),
     person: int().notNull(),
-    status: text().notNull().default("pending"),
+    status: text().notNull().default(PENDING_STATUS),
 })
 
 export type Reserva = typeof reserva.$inferSelect
-

@@ -51,17 +51,8 @@ export default defineNuxtConfig({
             tasks: true,
         },
         scheduledTasks: {
-            "*/15 * * * *": ["cleanPendingReservations"], // Run every 5 minutes
+            "*/15 * * * *": ["cleanPendingReservations"],
         },
-    },
-
-    devtools: {
-        /*
-        timeline: {
-            enabled: false,
-        },*/
-        enabled: true, // or false to disable
-        
     },
     runtimeConfig: {
         // Public keys that are exposed to the client

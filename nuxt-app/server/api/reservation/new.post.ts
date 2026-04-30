@@ -13,7 +13,10 @@ import {
 } from "../../../app/lib/db/schemas/index"
 import { eq, and, inArray } from "drizzle-orm"
 import { DEFAULT_STAY_TIME_MULTIPLIER } from "~/../shared/const/stayTime"
+import { RESERVATION_STATUS } from "~/../shared/const/reservationStatus"
 import extractCalculate from "../../../shared/helpers/extractCalculate"
+
+const PENDING_STATUS = RESERVATION_STATUS[0]
 
 export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession({
@@ -29,7 +32,7 @@ export default defineEventHandler(async (event) => {
             .select()
             .from(reserva)
             .where(
-                and(eq(reserva.userId, userId), eq(reserva.status, "pending")),
+                and(eq(reserva.userId, userId), eq(reserva.status, PENDING_STATUS)),
             )
 
         // verificando se existem reservas ativas
@@ -99,7 +102,7 @@ export default defineEventHandler(async (event) => {
                     checkOut: null,
                     stayTime: body.stayTime,
                     person: body.person,
-                    status: "pending",
+                    status: PENDING_STATUS,
                 }
 
             // inserindo a nova reserva no banco de dados e armazenando o resultado

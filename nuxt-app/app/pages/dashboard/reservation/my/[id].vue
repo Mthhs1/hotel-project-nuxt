@@ -3,6 +3,11 @@ import { type Quarto, type Reserva } from "~/lib/db/schemas"
 import { callWithNuxt } from "#app"
 import TopBadgeMyReservations from "~/components/dashboard/reservation/my/topBadgeMyReservations.vue"
 import MainMyReservations from "~/components/dashboard/reservation/my/mainMyReservations.vue"
+import {
+    RESERVATION_STATUS_BADGE_COLOR,
+    RESERVATION_STATUS_LABEL,
+    type ReservationStatus,
+} from "~/../shared/const/reservationStatus"
 
 const response = await useAsyncData("get-my-reservation", async () => {
     const nuxtApp = useNuxtApp()
@@ -30,29 +35,6 @@ const response = await useAsyncData("get-my-reservation", async () => {
 const reservation = ref<
     { quarto: Quarto | null; reserva: Reserva } | null | undefined
 >(response.data.value)
-const a = reservation.value
-
-type BadgeColor =
-    | "success"
-    | "warning"
-    | "error"
-    | "primary"
-    | "secondary"
-    | "info"
-    | "neutral"
-
-const mapStatusToColor: Record<string, BadgeColor> = {
-    reserved: "success",
-    pending: "warning",
-    cancelled: "error",
-    neutral: "neutral",
-}
-
-const mapStatusToText: Record<string, string> = {
-    reserved: "Reservado",
-    pending: "Pendente",
-    cancelled: "Cancelado",
-}
 
 const checkInDate = computed(() => {
     if (reservation.value?.reserva.checkIn) {
@@ -111,17 +93,17 @@ const checkOutDate = computed(() => {
                             <!-- Badge de Status -->
                             <UBadge
                                 :color="
-                                    mapStatusToColor[
-                                        reservation?.reserva.status ?? 'neutral'
-                                    ]
+                                    reservation?.reserva.status
+                                        ? RESERVATION_STATUS_BADGE_COLOR[reservation.reserva.status as ReservationStatus]
+                                        : 'neutral'
                                 "
                                 variant="soft"
                                 size="lg"
                             >
                                 {{
-                                    mapStatusToText[
-                                        reservation?.reserva.status ?? "neutral"
-                                    ] || "Status desconhecido"
+                                    reservation?.reserva.status
+                                        ? RESERVATION_STATUS_LABEL[reservation.reserva.status as ReservationStatus]
+                                        : "Status desconhecido"
                                 }}
                             </UBadge>
 

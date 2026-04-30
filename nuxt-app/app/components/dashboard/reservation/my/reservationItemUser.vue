@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import { type AdicionalItem } from "~/lib/db/schemas"
+import {
+    RESERVATION_STATUS_BADGE_COLOR,
+    RESERVATION_STATUS_LABEL,
+    type ReservationStatus,
+} from "~/../shared/const/reservationStatus"
 
 const props = defineProps<{
     roomType: string
-    status: string
+    status: ReservationStatus
     id: number
 }>()
-
-const expandable = ref(false)
-
-function changeExpandable(): void {
-    expandable.value = !expandable.value
-}
 
 interface MapStrToNumber {
     [key: string]: number
@@ -23,34 +21,6 @@ const mapRoomsToId: MapStrToNumber = {
     "Quarto Classe Alta": 3,
 }
 
-type BadgeColor =
-    | "success"
-    | "warning"
-    | "error"
-    | "primary"
-    | "secondary"
-    | "info"
-    | "neutral"
-
-interface MapStrToColor {
-    [key: string]: BadgeColor
-}
-
-interface MapStrToText {
-    [key: string]: string
-}
-
-const mapStatusToColor = reactive<MapStrToColor>({
-    reserved: "success",
-    pending: "warning",
-    cancelled: "error",
-})
-
-const mapStatusToText: MapStrToText = {
-    reserved: "Reservado",
-    pending: "Pendente",
-    cancelled: "Cancelado",
-}
 </script>
 
 <template>
@@ -71,8 +41,8 @@ const mapStatusToText: MapStrToText = {
                         </UButton>
                         <UBadge
                             class=""
-                            :color="mapStatusToColor[props.status]"
-                            >{{ mapStatusToText[props.status] }}</UBadge
+                            :color="RESERVATION_STATUS_BADGE_COLOR[props.status]"
+                            >{{ RESERVATION_STATUS_LABEL[props.status] }}</UBadge
                         >
                     </div>
                 </div>

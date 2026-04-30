@@ -9,6 +9,7 @@ import {
     type Reserva,
 } from "../../../../app/lib/db/schemas/index"
 import db from "../../../../app/lib/db/index"
+import { RESERVATION_STATUS } from "../../../../shared/const/reservationStatus"
 
 function getRandomInt(min: number, max: number) {
     min = Math.ceil(min)
@@ -16,7 +17,7 @@ function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-const reservaStatusList = ["Confirmed", "Cancelled", "Completed"]
+const reservaStatusList = [...RESERVATION_STATUS]
 const reservaHorasList = [2, 4, 6, 12]
 
 const dataAtual = Date.now()
@@ -56,9 +57,9 @@ export async function seedReservas() {
         let checkIn: number | null = null
         let checkOut: number | null = null
 
-        if (status === "Confirmed") {
+        if (status === "confirmed") {
             checkIn = getRandomInt(dataAtual - 3600 * 24 * 30, dataAtual)
-        } else if (status === "Completed") {
+        } else if (status === "completed") {
             checkIn = getRandomInt(dataAtual - 3600 * 24 * 30, dataAtual)
             checkOut = getRandomInt(checkIn, dataAtual + 3600 * 24)
         }

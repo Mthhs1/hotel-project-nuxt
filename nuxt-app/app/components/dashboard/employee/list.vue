@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Quarto, Reserva } from "~/lib/db/schemas/index"
+import { type ReservationStatus } from "~/../shared/const/reservationStatus"
 import Item from "./item.vue"
 
 const props = defineProps<{
@@ -21,7 +22,7 @@ const emits = defineEmits<{
             <Item
                 :id="reservation.reserva.id"
                 :room-type="reservation.quarto?.roomType || ''"
-                :status="reservation.reserva.status"
+                :status="reservation.reserva.status as ReservationStatus"
                 :date-crated="reservation.reserva.createdAt"
                 class="flex-1"
                 @status-changed="emits('status-changed')"

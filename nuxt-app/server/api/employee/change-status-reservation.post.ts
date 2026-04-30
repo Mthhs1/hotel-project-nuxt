@@ -1,9 +1,11 @@
 import db from "~/lib/db"
 import {
+    Reserva,
     reserva,
 } from "~/lib/db/schemas/index"
 import { eq, } from "drizzle-orm"
 import { auth } from "~/lib/auth"
+import { RESERVATION_STATUS, ReservationStatus } from "~/../shared/const/reservationStatus"
 
 export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession({
@@ -27,9 +29,9 @@ export default defineEventHandler(async (event) => {
 
         const body = await readBody(event)
         const reservaId = Number(body.reservationId)
-        const newStatus = String(body.newStatus)
+        const newStatus = String(body.newStatus) as ReservationStatus
 
-        const validStatuses = ["pending", "Confirmed", "Cancelled", "Completed"]
+        const validStatuses = [...RESERVATION_STATUS]
         if (!validStatuses.includes(newStatus)) {
             throw createError({
                 status: 400,
