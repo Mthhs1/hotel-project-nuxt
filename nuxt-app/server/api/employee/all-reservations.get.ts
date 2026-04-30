@@ -5,6 +5,8 @@ import {
 } from "~/lib/db/schemas/index"
 import { eq, asc, desc, count } from "drizzle-orm"
 import { auth } from "~/lib/auth"
+import { paginatedReservationListQuerySchema } from "../../utils/schemas/reservation"
+import * as zod from "zod"
 
 export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession({
@@ -22,20 +24,25 @@ export default defineEventHandler(async (event) => {
             statusText: "Forbidden",
         })
     } else {
-        console.log(
-            "Requisitando parâmetros do evento para a listagem de quartos (employee)",
-        )
-
         const query = await getQuery(event)
-        const sortBy = String(query.by || "id")
-        const sortDir = String(query.ascending || "asc").toLowerCase()
+        const parsedQuery = paginatedReservationListQuerySchema.safeParse(query)
 
-        const itemsPerPage = Number(query.itemsPerPage)
-        const page = Number(query.page)
+        if (!parsedQuery.success) {
+            throw createError({
+                statusCode: 400,
+                statusMessage: "Invalid query parameters",
+                data: zod.treeifyError(parsedQuery.error),
+            })
+        }
+
+        const sortBy = parsedQuery.data.by
+        const sortDir = parsedQuery.data.ascending
+        const itemsPerPage = parsedQuery.data.itemsPerPage
+        const page = parsedQuery.data.page
         const offset = (page - 1) * itemsPerPage
 
         // whitelist das colunas permitidas para ordenação
-        const columnsMap: Record<string, any> = {
+        const columnsMap: Record<string, typeof reserva.id | typeof reserva.status> = {
             id: reserva.id,
             status: reserva.status,
         }
@@ -60,14 +67,13 @@ export default defineEventHandler(async (event) => {
                 .select({ count: count() })
                 .from(reserva)
 
-            console.log(
-                "Resposta do banco de dados (employee):",
-                responseDB.slice(0, 2),
-            )
             return { data: responseDB, totalRoomsNumber: responseDBCount[0]?.count || 0 }
         } catch (error) {
             console.error("Error fetching reservations:", error)
-            throw new Error("Failed to fetch reservations")
+            throw createError({
+                statusCode: 500,
+                statusMessage: "Failed to fetch reservations",
+            })
         }
     }
 })

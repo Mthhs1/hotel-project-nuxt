@@ -3,6 +3,8 @@ import { quarto, type Quarto } from "~/lib/db/schemas"
 import { adicionalItem, type AdicionalItem } from "~/lib/db/schemas"
 import { adicionalRelacao } from "~/lib/db/schemas"
 import { eq, asc } from "drizzle-orm"
+import { roomListQuerySchema } from "../../utils/schemas/room"
+import zod from "zod"
 
 type quartoWithAdditionals = {
     quarto: Quarto
@@ -10,12 +12,19 @@ type quartoWithAdditionals = {
 }
 
 export default defineEventHandler(async (event) => {
-    console.log("Requisitando parâmetros do evento para a listagem de quartos")
     const query = await getQuery(event)
-    const getRoomName = String(query.quarto)
+    const parsedQuery = roomListQuerySchema.safeParse(query)
 
-    const itemsPerPage = Number(query.itemsPerPage)
-    const page = Number(query.page)
+    if (!parsedQuery.success) {
+        throw createError({
+            statusCode: 400,
+            statusMessage: "Invalid query parameters",
+            data: zod.treeifyError(parsedQuery.error),
+        })
+    }
+
+    const itemsPerPage = parsedQuery.data.itemsPerPage
+    const page = parsedQuery.data.page
     const offset = (page - 1) * itemsPerPage
 
     const numberRooms = await db.$count(quarto)

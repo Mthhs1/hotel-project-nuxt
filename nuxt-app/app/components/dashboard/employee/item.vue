@@ -14,7 +14,7 @@ const props = defineProps<{
 
 async function handleChangeReservationStatus() {
     try {
-        const response = await $fetch(
+        await $fetch(
             "/api/employee/change-status-reservation",
             {
                 method: "POST",
@@ -26,7 +26,6 @@ async function handleChangeReservationStatus() {
             },
         )
 
-        console.log("Resposta da API (employee):", response)
         emits("status-changed")
     } catch (error) {
         console.error("Error changing reservation status:", error)

@@ -25,7 +25,6 @@ const response = await useAsyncData("get-my-reservation", async () => {
     })
 
     if (!responseReservation) {
-        console.log("Reserva não encontrada, redirecionando para dashboard")
         await callWithNuxt(nuxtApp, navigateTo, ["/dashboard"])
     }
 

@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { type AdicionalItem, type Quarto, type AdicionalConsumido } from "~/lib/db/schemas"
+import {
+    type AdicionalItem,
+    type Quarto,
+    type AdicionalConsumido,
+} from "~/lib/db/schemas"
 
 import {
     reservationFormSchema,
@@ -35,19 +39,21 @@ const {
     initialState: toRef(props, "initialState"),
 })
 
-watch(state, (newVal) => {
-    emits("extract-change", {
-        hours: newVal.hours ?? "",
-        guests: newVal.guests ?? 0,
-        booleanAdditionals: newVal.booleanAdditionals ?? [],
-        quantityAdditionals: newVal.quantityAdditionals ?? {},
-    })
-},{
-    deep: true,
-    immediate: true,
-})
-
-const toast = useToast()
+watch(
+    state,
+    (newVal) => {
+        emits("extract-change", {
+            hours: newVal.hours ?? "",
+            guests: newVal.guests ?? 0,
+            booleanAdditionals: newVal.booleanAdditionals ?? [],
+            quantityAdditionals: newVal.quantityAdditionals ?? {},
+        })
+    },
+    {
+        deep: true,
+        immediate: true,
+    },
+)
 </script>
 
 <template>
@@ -132,6 +138,7 @@ const toast = useToast()
                         label="Quantas horas sera sua estadia?"
                         name="hours"
                         size="md"
+                        :ui="{ label: 'h-12' }"
                     >
                         <USelect
                             v-model="state.hours"
@@ -147,6 +154,7 @@ const toast = useToast()
                         label="Numero de hospedes"
                         name="guests"
                         size="md"
+                        :ui="{ label: 'h-12' }"
                     >
                         <UInputNumber
                             v-model="state.guests"
@@ -180,7 +188,6 @@ const toast = useToast()
                         :key="key"
                         class="rounded-2xl bg-white/80 p-4 ring-1 ring-amber-200/80 flex flex-col gap-4 md:flex-row"
                     >
-                        
                         <UFormField
                             :label="`Deseja ${value.name}?`"
                             orientation="horizontal"

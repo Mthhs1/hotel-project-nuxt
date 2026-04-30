@@ -1,22 +1,30 @@
 import db from "~/lib/db"
 import { quarto, type Quarto } from "~/lib/db/schemas"
 import { eq } from "drizzle-orm"
+import { roomLookupQuerySchema } from "../../utils/schemas/room"
+import zod from "zod"
 
 export default defineEventHandler(async (event) => {
-    console.log("Requisitando parâmetros do evento")
     const query = await getQuery(event)
-    console.log("Parâmetros", query)
+    const parsedQuery = roomLookupQuerySchema.safeParse(query)
+
+    if (!parsedQuery.success) {
+        throw createError({
+            statusCode: 400,
+            statusMessage: "Invalid query parameters",
+            data: zod.treeifyError(parsedQuery.error),
+        })
+    }
 
     let selectedRoom: Quarto | undefined
 
-    const whereCondition = String(query.by)
-    // const identifier = String(query.identifier)
+    const whereCondition = parsedQuery.data.by
 
     if (whereCondition === "roomType") {
         const response = await db
             .select()
             .from(quarto)
-            .where(eq(quarto.roomType, String(query.identifier)))
+            .where(eq(quarto.roomType, String(parsedQuery.data.identifier)))
             .limit(1)
 
         selectedRoom = response[0]
@@ -24,7 +32,7 @@ export default defineEventHandler(async (event) => {
         const response = await db
             .select()
             .from(quarto)
-            .where(eq(quarto.id, Number(query.identifier)))
+            .where(eq(quarto.id, Number(parsedQuery.data.identifier)))
             .limit(1)
 
         selectedRoom = response[0]

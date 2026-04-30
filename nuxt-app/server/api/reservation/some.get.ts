@@ -1,17 +1,17 @@
-// import db from "~/lib/db"
 import { auth } from "~/lib/auth"
-import db from "../../../app/lib/db/index"
+import db from "~/lib/db"
 import {
-    reserva,
-    quarto,
-    adicionalConsumido,
-    adicionalItem,
-    type Quarto,
-    type Reserva,
     type AdicionalConsumido,
     type AdicionalItem,
-} from "../../../app/lib/db/schemas/index"
+    adicionalConsumido,
+    quarto,
+    reserva,
+    type Quarto,
+    type Reserva,
+} from "~/lib/db/schemas"
 import { eq, and } from "drizzle-orm"
+import { reservationByIdQuerySchema } from "../../utils/schemas/reservation"
+import zod from "zod"
 
 export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession({
@@ -21,7 +21,17 @@ export default defineEventHandler(async (event) => {
     let reservations: { quarto: Quarto | null; reserva: Reserva } | null = null
 
     const query = await getQuery(event)
-    const reservaId = Number(query.id)
+    const parsedQuery = reservationByIdQuerySchema.safeParse(query)
+
+    if (!parsedQuery.success) {
+        throw createError({
+            statusCode: 400,
+            statusMessage: "Invalid query parameters",
+            data: zod.treeifyError(parsedQuery.error),
+        })
+    }
+
+    const reservaId = parsedQuery.data.id
 
     if (session && session.user) {
         const user = session.user
@@ -38,34 +48,18 @@ export default defineEventHandler(async (event) => {
                 .limit(1)
 
             reservations = responseDBreservations[0] || null
-            // return responseDB.length > 0 ? responseDB[0] : null
         } catch (error) {
             console.error("Error fetching reservations:", error)
-            throw new Error("Failed to fetch reservations")
+            throw createError({
+                statusCode: 500,
+                statusMessage: "Failed to fetch reservation",
+            })
         }
-
-        let additionals: {
-            adicionalItem: AdicionalItem
-            adicionalConsumido: AdicionalConsumido
-        }[] = []
-
-        if (reservations && Object.keys(reservations).length > 0) {
-            try {
-                const responseDBadditionals = await db
-                    .select()
-                    .from(adicionalConsumido)
-                    .where(
-                        eq(
-                            adicionalConsumido.reservaId,
-                            reservaId,
-                        ),
-                    )
-
-            } catch (error) {
-                console.error("Error fetching additional items:", error)
-            }
-        }
-
         return reservations
     }
+
+    throw createError({
+        statusCode: 401,
+        statusMessage: "Unauthorized",
+    })
 })

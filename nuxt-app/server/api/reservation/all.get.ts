@@ -1,8 +1,9 @@
-// import db from "~/lib/db"
 import { auth } from "~/lib/auth"
-import db from "../../../app/lib/db/index"
-import { reserva, quarto } from "../../../app/lib/db/schemas/index"
-import { eq, and, asc, desc } from "drizzle-orm"
+import db from "~/lib/db"
+import { quarto, reserva } from "~/lib/db/schemas"
+import { asc, desc, eq } from "drizzle-orm"
+import { reservationListQuerySchema } from "../../utils/schemas/reservation"
+import * as zod from "zod"
 
 export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession({
@@ -10,8 +11,18 @@ export default defineEventHandler(async (event) => {
     })
 
     const query = await getQuery(event)
-    const sortBy = String(query.by || "id")
-    const sortDir = String(query.ascending || "asc").toLowerCase()
+    const parsedQuery = reservationListQuerySchema.safeParse(query)
+
+    if (!parsedQuery.success) {
+        throw createError({
+            statusCode: 400,
+            statusMessage: "Invalid query parameters",
+            data: zod.treeifyError(parsedQuery.error),
+        })
+    }
+
+    const sortBy = parsedQuery.data.by
+    const sortDir = parsedQuery.data.ascending
 
     // whitelist das colunas permitidas para ordenação
     const columnsMap: Record<string, any> = {
@@ -35,12 +46,13 @@ export default defineEventHandler(async (event) => {
                 .orderBy(orderClause)
                 .leftJoin(quarto, eq(quarto.id, reserva.quartoId))
 
-            console.log("Dados",responseDB)
-
             return responseDB
         } catch (error) {
             console.error("Error fetching reservations:", error)
-            throw new Error("Failed to fetch reservations")
+            throw createError({
+                statusCode: 500,
+                statusMessage: "Failed to fetch reservations",
+            })
         }
     }
 

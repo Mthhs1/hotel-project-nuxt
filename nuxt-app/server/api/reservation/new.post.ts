@@ -1,6 +1,5 @@
-// import db from "~/lib/db"
-import { auth } from "../../../app/lib/auth"
-import db from "../../../app/lib/db/index"
+import { auth } from "~/lib/auth"
+import db from "~/lib/db"
 import {
     type Reserva,
     type AdicionalConsumido,
@@ -10,11 +9,12 @@ import {
     adicionalItem,
     adicionalConsumido,
     quarto,
-} from "../../../app/lib/db/schemas/index"
-import { eq, and, inArray } from "drizzle-orm"
-import { DEFAULT_STAY_TIME_MULTIPLIER } from "~/../shared/const/stayTime"
-import { RESERVATION_STATUS } from "~/../shared/const/reservationStatus"
+} from "~/lib/db/schemas"
+import { and, eq } from "drizzle-orm"
+import { RESERVATION_STATUS } from "../../../shared/const/reservationStatus"
 import extractCalculate from "../../../shared/helpers/extractCalculate"
+import { createReservationBodySchema } from "../../utils/schemas/reservation"
+import zod from "zod"
 
 const PENDING_STATUS = RESERVATION_STATUS[0]
 
@@ -38,18 +38,18 @@ export default defineEventHandler(async (event) => {
         // verificando se existem reservas ativas
         if (!response || response.length === 0) {
             // lendo os dados do corpo da requisição
-            const body = await readBody<{
-                quartoId: number
-                person: number
-                stayTime: number
-                additionals: {
-                    quantityAdditionals: Record<
-                        string,
-                        { isMarked: boolean; quantity: number }
-                    >
-                    booleanAdditionals: string[]
-                }
-            }>(event)
+            const body = await readBody(event)
+            const parsedBody = createReservationBodySchema.safeParse(body)
+
+            if (!parsedBody.success) {
+                throw createError({
+                    statusCode: 400,
+                    statusMessage: "Invalid request body",
+                    data: zod.treeifyError(parsedBody.error),
+                })
+            }
+
+            const reservationData = parsedBody.data
 
             // criando a variavel para amarzenar o resultado da criação da reserva
             let reservaResult: Reserva[]
@@ -60,11 +60,14 @@ export default defineEventHandler(async (event) => {
                 const roomResponse = await db
                     .select()
                     .from(quarto)
-                    .where(eq(quarto.id, body.quartoId))
+                    .where(eq(quarto.id, reservationData.quartoId))
                 room = roomResponse[0] || null
             } catch (error) {
                 console.error("Error fetching room details:", error)
-                throw new Error("Failed to fetch room details")
+                throw createError({
+                    statusCode: 500,
+                    statusMessage: "Failed to fetch room details",
+                })
             }
 
             // buscando os detalhes dos adicionais
@@ -73,7 +76,10 @@ export default defineEventHandler(async (event) => {
                 additionalsResponse = await db.select().from(adicionalItem)
             } catch (error) {
                 console.error("Error fetching additionals:", error)
-                throw new Error("Failed to fetch additionals")
+                throw createError({
+                    statusCode: 500,
+                    statusMessage: "Failed to fetch additionals",
+                })
             }
 
             // mapeando os adicionais para um formato de fácil acesso por id
@@ -85,23 +91,23 @@ export default defineEventHandler(async (event) => {
             // usando uma função auxiliar para calcular os preços dos adicionais
             const { booleanAdditionalsPrice, quantityAdditionalsPrice } =
                 extractCalculate(room!, additionalsDB, {
-                    hours: body.stayTime,
-                    guests: body.person,
-                    booleanAdditionals: body.additionals.booleanAdditionals,
-                    quantityAdditionals: body.additionals.quantityAdditionals,
+                    hours: reservationData.stayTime,
+                    guests: reservationData.person,
+                    booleanAdditionals: reservationData.additionals.booleanAdditionals,
+                    quantityAdditionals: reservationData.additionals.quantityAdditionals,
                 })
 
             // criando o objeto de dados para a nova reserva
             const reservaData: Omit<Reserva, "id" | "createdAt" | "updateAt"> =
                 {
-                    quartoId: body.quartoId,
+                    quartoId: reservationData.quartoId,
                     userId: userId,
                     firstName: null,
                     lastName: null,
                     checkIn: null,
                     checkOut: null,
-                    stayTime: body.stayTime,
-                    person: body.person,
+                    stayTime: reservationData.stayTime,
+                    person: reservationData.person,
                     status: PENDING_STATUS,
                 }
 
@@ -113,7 +119,10 @@ export default defineEventHandler(async (event) => {
                     .returning()
             } catch (error) {
                 console.error("Error creating reservation:", error)
-                throw new Error("Failed to create reservation")
+                throw createError({
+                    statusCode: 500,
+                    statusMessage: "Failed to create reservation",
+                })
             }
 
             // declarando um array para armazenar os adicionais consumidos relacionados à reserva criada
@@ -155,7 +164,10 @@ export default defineEventHandler(async (event) => {
                     await db.insert(adicionalConsumido).values(additionalsUnion)
                 } catch (error) {
                     console.error("Error inserting consumed additionals:", error)
-                    throw new Error("Failed to insert consumed additionals")
+                    throw createError({
+                        statusCode: 500,
+                        statusMessage: "Failed to insert consumed additionals",
+                    })
                 }
             }
 
@@ -164,8 +176,13 @@ export default defineEventHandler(async (event) => {
         } else {
             throw createError({
                 statusCode: 400,
-                message: "Usuário já possui uma reserva ativa.",
+                statusMessage: "Usuário já possui uma reserva ativa.",
             })
         }
     }
+
+    throw createError({
+        statusCode: 401,
+        statusMessage: "Unauthorized",
+    })
 })

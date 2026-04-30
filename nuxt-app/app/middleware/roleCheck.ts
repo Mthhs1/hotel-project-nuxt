@@ -1,6 +1,4 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-    console.log("Aqui")
-
     if (
         !to.path.startsWith("/dashboard/employee") ||
         !to.path.includes("/employee")

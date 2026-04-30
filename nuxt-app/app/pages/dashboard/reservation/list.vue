@@ -33,7 +33,6 @@ async function handleNewPageList(value: number) {
         method: "GET",
         query: { itemsPerPage: itemsPerPage.value, page: page.value },
     })
-    console.log("oi")
     rooms.value = response.rooms
     totalNumberRooms.value = response.numberRooms
 }

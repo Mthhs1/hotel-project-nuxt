@@ -2,7 +2,8 @@ import db from "~/lib/db"
 import { reserva, quarto, adicionalConsumido } from "~/lib/db/schemas/index"
 import { eq } from "drizzle-orm"
 import { auth } from "~/lib/auth"
-
+import { employeeReservationRoomQuerySchema } from "../../utils/schemas/reservation"
+import * as zod from "zod"
 
 export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession({
@@ -20,13 +21,19 @@ export default defineEventHandler(async (event) => {
             statusText: "Forbidden",
         })
     } else {
-        console.log(
-            "Requisitando parâmetros do evento para a listagem de quartos (employee)",
-        )
-
         const query = await getQuery(event)
-        const reservaId = Number(query.reservationId)
-        const limit = Number(query.limit) ?? 1
+        const parsedQuery = employeeReservationRoomQuerySchema.safeParse(query)
+
+        if (!parsedQuery.success) {
+            throw createError({
+                statusCode: 400,
+                statusMessage: "Invalid query parameters",
+                data: zod.treeifyError(parsedQuery.error),
+            })
+        }
+
+        const reservaId = parsedQuery.data.reservationId
+        const limit = parsedQuery.data.limit
 
         try {
             const selectedReservations = await db
@@ -37,8 +44,8 @@ export default defineEventHandler(async (event) => {
 
             if (!selectedReservations || selectedReservations.length === 0) {
                 throw createError({
-                    status: 404,
-                    statusText: "Reservation not found",
+                    statusCode: 404,
+                    statusMessage: "Reservation not found",
                 })
             }
 
@@ -46,8 +53,8 @@ export default defineEventHandler(async (event) => {
 
             if (!reservation) {
                 throw createError({
-                    status: 404,
-                    statusText: "Reservation not found",
+                    statusCode: 404,
+                    statusMessage: "Reservation not found",
                 })
             }
 
@@ -59,8 +66,8 @@ export default defineEventHandler(async (event) => {
 
             if (!selectedRooms || selectedRooms.length === 0) {
                 throw createError({
-                    status: 404,
-                    statusText: "Room not found",
+                    statusCode: 404,
+                    statusMessage: "Room not found",
                 })
             }
 
@@ -79,9 +86,13 @@ export default defineEventHandler(async (event) => {
             }
 
         } catch (error) {
+            if (isError(error)) {
+                throw error
+            }
+
             throw createError({
-                status: 500,
-                statusText: "Internal Server Error",
+                statusCode: 500,
+                statusMessage: "Internal Server Error",
             })
         }
     }

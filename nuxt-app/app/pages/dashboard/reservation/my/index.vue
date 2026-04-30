@@ -42,10 +42,7 @@ const valueSorting = ref<string | "">("")
 const valueAscending = ref<string | "">("")
 
 async function onChangeOrder() {
-
     if (valueSorting.value || valueAscending.value) {
-        console.log("Dentro");
-        
         const responseReservations = await $fetch("/api/reservation/all", {
             method: "GET",
             query: {
